@@ -3,6 +3,7 @@ name = "gamma_ray"
 version = "0.1.0"
 authors = ["Sebastian <Sebastian@Strobl.net>"]
 edition = "2018"
+license-file = "LICENSE"
 repository = "https://github.com/TriedWorks/gamma_ray"
 categories = ["math", "mathematics", "science", "physics"]
 keywords = ["math", "mathematics", "science", "physics"]

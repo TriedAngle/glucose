@@ -1,3 +1,4 @@
+#[macro_export]
 macro_rules! vectors {
     ($($n:ident => [$t:ty; $d:expr]),+) => {
         $(

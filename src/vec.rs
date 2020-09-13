@@ -21,6 +21,13 @@ macro_rules! vectors {
                     }
                 }
 
+                pub const fn broadcast(value: $t) -> Self {
+                    let data = [value; $d];
+                    Self {
+                        data,
+                    }
+                }
+
                 #[inline]
                 pub fn unit_n(n: usize) -> Self {
                     let mut data = [<$t>::default(); $d];
@@ -31,7 +38,7 @@ macro_rules! vectors {
                 }
 
                 #[inline]
-                pub fn dot(&self, other: &$n) -> $t {
+                pub fn dot(&self, other: $n) -> $t {
                     let mut sum = self.data[0] * other.data[0];
                     for i in 1..$d {
                         sum += self.data[i] * other.data[i];
@@ -66,6 +73,78 @@ macro_rules! vectors {
                     let mut vector = self.clone();
                     vector.normalize();
                     vector
+                }
+
+                #[inline]
+                pub fn abs(&mut self) {
+                    for i in 0..$d {
+                        self.data[i] = self.data[i].abs();
+                    }
+                }
+
+                #[inline]
+                pub fn absd(&self) -> Self {
+                    let mut vector = self.clone();
+                    vector.abs();
+                    vector
+                }
+
+                #[inline]
+                pub fn reflect(&mut self, normal: $n) {
+                    *self -= 2 as $t * self.dot(normal) * normal;
+                }
+
+                #[inline]
+                pub fn reflected(&self, normal: $n) -> Self {
+                    let mut vector = *self;
+                    vector.reflect(normal);
+                    vector
+                }
+
+                #[inline]
+                pub fn clamp(&mut self, min: $n, max: $n) {
+                    for i in 0..$d {
+                        self.data[i] = self.data[i].max(min.data[i]).min(max.data[i])
+                    }
+                }
+
+                #[inline]
+                pub fn clamped(&self, min: $n, max: $n) -> Self {
+                    let mut vector = self.clone();
+                    vector.clamp(min, max);
+                    vector
+                }
+
+               #[inline]
+                pub fn map<F: Fn($t) -> $t>(&self, f: F) -> Self {
+                    let mut vector = self.clone();
+                    for i in 0..$d {
+                        vector.data[i] = f(vector.data[i]);
+                    }
+                    vector
+                }
+
+                #[inline]
+                pub fn apply<F: Fn($t) -> $t>(&mut self, f: F) {
+                    for i in 0..$d {
+                        self.data[i] = f(self.data[i]);
+                    }
+                }
+
+                #[inline]
+                pub fn max_by_component(mut self, other: Self) -> Self {
+                   for i in 0..$d {
+                        self.data[i] = self.data[i].max(other.data[i]);
+                   }
+                   self
+                }
+
+                #[inline]
+                pub fn min_by_component(mut self, other: Self) -> Self {
+                   for i in 0..$d {
+                        self.data[i] = self.data[i].min(other.data[i]);
+                   }
+                   self
                 }
             }
 
@@ -226,6 +305,7 @@ macro_rules! letters_for_vectors {
                     }
 
                     paste! {
+                        // Create a new unit vector $d
                         #[inline]
                         pub fn [<set_ $d>](&mut self, value: $t) {
                             self.data[$c] = value;
@@ -245,6 +325,7 @@ macro_rules! letters_for_vectors {
 }
 
 // this is a temporary macro to implement the cross product only for the Vec3
+#[macro_export]
 macro_rules! cross_product {
     ($n:ident) => {
         impl $n {

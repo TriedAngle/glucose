@@ -324,6 +324,26 @@ macro_rules! letters_for_vectors {
     }
 }
 
+#[macro_export]
+macro_rules! vectors_from_letters {
+    ($($n:ident => $m:ident from {$($v:ident => $d:expr),+}),+) => {
+        $(
+             impl $n {
+                $(
+                    pub fn $v(&self) -> $m {
+                        let data = self.data.clone();
+                        let mut vec = $m::broadcast(data[0]);
+                        for i in &$d {
+                            vec.data[*i] = data[*i];
+                        }
+                        vec
+                    }
+                )+
+            }
+        )+
+    }
+}
+
 // this is a temporary macro to implement the cross product only for the Vec3
 #[macro_export]
 macro_rules! cross_product {
@@ -360,6 +380,11 @@ letters_for_vectors! {
     Vec2 => [0 => x, 1 => y] {f32},
     Vec3 => [0 => x, 1 => y, 2 => z] {f32},
     Vec4 => [0 => x, 1 => y, 2 => z, 3 => w] {f32}
+}
+
+vectors_from_letters! {
+    Vec3 => Vec2 from {xy => [0, 1], xz => [0, 2], zy => [1, 2]},
+    Vec4 => Vec3 from {xyz => [0, 1, 2], xyw => [0, 1, 3], xzw => [0, 2, 3], yzw => [1, 2, 3]}
 }
 
 cross_product!(Vec3);

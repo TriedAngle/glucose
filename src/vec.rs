@@ -76,6 +76,18 @@ macro_rules! vectors {
                 }
 
                 #[inline]
+                pub fn reverse(&mut self) {
+                    self.data.reverse();
+                }
+
+                #[inline]
+                pub fn reversed(&self) -> Self {
+                    let mut vector = self.clone();
+                    vector.reverse();
+                    vector
+                }
+
+                #[inline]
                 pub fn abs(&mut self) {
                     for i in 0..$d {
                         self.data[i] = self.data[i].abs();

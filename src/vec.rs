@@ -38,7 +38,7 @@ macro_rules! vectors {
                 }
 
                 #[inline]
-                pub fn dot(&self, other: $n) -> $t {
+                pub fn dot(&self, other: Self) -> $t {
                     let mut sum = self.data[0] * other.data[0];
                     for i in 1..$d {
                         sum += self.data[i] * other.data[i];
@@ -102,7 +102,7 @@ macro_rules! vectors {
                 }
 
                 #[inline]
-                pub fn reflect(&mut self, normal: $n) {
+                pub fn reflect(&mut self, normal: Self) {
                     *self -= 2 as $t * self.dot(normal) * normal;
                 }
 
@@ -114,14 +114,14 @@ macro_rules! vectors {
                 }
 
                 #[inline]
-                pub fn clamp(&mut self, min: $n, max: $n) {
+                pub fn clamp(&mut self, min: Self, max: Self) {
                     for i in 0..$d {
                         self.data[i] = self.data[i].max(min.data[i]).min(max.data[i])
                     }
                 }
 
                 #[inline]
-                pub fn clamped(&self, min: $n, max: $n) -> Self {
+                pub fn clamped(&self, min: Self, max: Self) -> Self {
                     let mut vector = self.clone();
                     vector.clamp(min, max);
                     vector
@@ -157,6 +157,16 @@ macro_rules! vectors {
                         self.data[i] = self.data[i].min(other.data[i]);
                    }
                    self
+                }
+
+                #[inline]
+                pub fn zero() -> Self {
+                    Self::broadcast(0 as $t)
+                }
+
+                #[inline]
+                pub fn one() -> Self {
+                    Self::broadcast(1 as $t)
                 }
             }
 
@@ -345,8 +355,11 @@ macro_rules! vectors_from_letters {
                     pub fn $v(&self) -> $m {
                         let data = self.data.clone();
                         let mut vec = $m::broadcast(data[0]);
+                        // using a counter looks weird... maybe there is a better way?
+                        let mut counter = 0;
                         for i in &$d {
-                            vec.data[*i] = data[*i];
+                            vec.data[counter] = data[*i];
+                            counter += 1;
                         }
                         vec
                     }

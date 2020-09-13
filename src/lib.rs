@@ -58,7 +58,9 @@ mod tests {
     #[test]
     fn split_vectors() {
         let vec_1 = Vec3::new([2.0, 3.0, 1.0]);
+        let x = vec_1.x();
         let vec_2 = vec_1.xy();
+        assert_eq!(x, 2.0);
         assert_eq!(vec_2.data, [2.0, 3.0]);
     }
 }

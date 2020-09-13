@@ -353,13 +353,11 @@ macro_rules! vectors_from_letters {
              impl $n {
                 $(
                     pub fn $v(&self) -> $m {
-                        let data = self.data.clone();
-                        let mut vec = $m::broadcast(data[0]);
-                        // using a counter looks weird... maybe there is a better way?
-                        let mut counter = 0;
-                        for i in &$d {
-                            vec.data[counter] = data[*i];
-                            counter += 1;
+                        // this is a 'hack' to get the same type
+                        let mut vec = $m::broadcast(self.data[0]);
+
+                        for (i, e) in $d.iter().enumerate() {
+                            vec.data[i] = self.data[*e];
                         }
                         vec
                     }
@@ -408,6 +406,7 @@ letters_for_vectors! {
 }
 
 vectors_from_letters! {
+    Vec2 => Vec1 from {xx => [0], yy => [1]},
     Vec3 => Vec2 from {xy => [0, 1], xz => [0, 2], zy => [1, 2]},
     Vec4 => Vec3 from {xyz => [0, 1, 2], xyw => [0, 1, 3], xzw => [0, 2, 3], yzw => [1, 2, 3]}
 }

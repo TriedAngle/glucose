@@ -32,6 +32,7 @@ macro_rules! vectors {
 
                 #[inline]
                 pub fn dot(&self, other: &$n) -> $t {
+                    // TODO: this should scale O(n), maybe there is a better way?
                     let mut sum = self.data[0] * other.data[0];
                     for i in 1..$d {
                         sum += self.data[i] * other.data[i];
@@ -87,7 +88,7 @@ macro_rules! letters_for_vectors {
     }
 }
 
-// create vectors
+// define vectors and implement basics
 vectors! {
     Vec1 => [f32; 1],
     Vec2 => [f32; 2],
@@ -99,7 +100,7 @@ vectors! {
     Vec8 => [f32; 8]
 }
 
-// impl for some vectors
+// impl some letters for vectors
 letters_for_vectors! {
     Vec1 => [0 => x] {f32},
     Vec2 => [0 => x, 1 => y] {f32},

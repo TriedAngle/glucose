@@ -5,12 +5,28 @@ mod vec;
 mod tests {
     use super::vec::*;
     #[test]
-    fn it_works() {
-        let test_vec_1 = Vec2::new([0.5, 1.0]);
-        let unit_vec_1 = Vec4::unit_n(1);
-        let mut unit_vec_2: Vec3 = Vec3::unit_y();
-        unit_vec_2.set_y(2.0);
+    fn create_vectors() {
+        let vec_1 = Vec3::new([0.0, 1.0, 2.0]);
+        let vec_2 = Vec3::unit_y();
 
-        println!("{:?}", unit_vec_2);
+        assert_eq!(vec_2.data, [0.0, 1.0, 0.0]);
+    }
+
+    #[test]
+    fn add_vectors() {
+        let vec_1 = Vec3::new([1.0, 3.0, 2.5]);
+        let vec_2 = Vec3::new([2.0, 3.0, -2.5]);
+        let vec_3 = vec_2 + vec_1;
+
+        assert_eq!(vec_3.data, [3.0, 6.0, 0.0]);
+    }
+
+    #[test]
+    fn dot_vectors() {
+        let vec_1 = Vec3::new([1.0, 3.0, 1.0]);
+        let vec_2 = Vec3::new([2.0, 3.0, 1.0]);
+        let dot = vec_1.dot(&vec_2);
+
+        assert_eq!(dot, 12.0);
     }
 }

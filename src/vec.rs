@@ -1,5 +1,6 @@
 #![allow(dead_code)]
 
+use std::ops::Add;
 use paste::paste;
 
 #[macro_export]
@@ -21,12 +22,34 @@ macro_rules! vectors {
                 }
 
                 #[inline]
-                pub const fn unit_n(n: usize) -> Self {
-                    let mut data = [0.0; $d];
-                    data[n] = 1.0;
+                pub fn unit_n(n: usize) -> Self {
+                    let mut data = [<$t>::default(); $d];
+                    data[n] = 1 as $t;
                     Self {
                         data,
                     }
+                }
+
+                #[inline]
+                pub fn dot(&self, other: &$n) -> $t {
+                    let mut sum = self.data[0] * other.data[0];
+                    for i in 1..$d {
+                        sum += self.data[i] * other.data[i];
+                    }
+                    sum
+                }
+
+            }
+
+            impl Add for $n {
+                type Output = Self;
+
+                fn add(self, other: $n) -> Self {
+                    let mut data = [<$t>::default(); $d];
+                    for i in 0..($d - 1) {
+                         data[i] = self.data[i] + other.data[i];
+                    }
+                    Self::new(data)
                 }
             }
         )+
@@ -52,7 +75,7 @@ macro_rules! letters_for_vectors {
                         }
 
                         #[inline]
-                        pub const fn [<unit_ $d>]() -> $n {
+                        pub fn [<unit_ $d>]() -> $n {
                             Self {
                                 data: $n::unit_n($c).data
                             }

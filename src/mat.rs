@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use crate::vec::{Vec2, Vec3, Vec4, Vec5, Vec6, Vec7, Vec8};
 
 #[macro_export]

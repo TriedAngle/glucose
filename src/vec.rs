@@ -32,7 +32,6 @@ macro_rules! vectors {
 
                 #[inline]
                 pub fn dot(&self, other: &$n) -> $t {
-                    // TODO: this should scale O(n), maybe there is a better way?
                     let mut sum = self.data[0] * other.data[0];
                     for i in 1..$d {
                         sum += self.data[i] * other.data[i];
@@ -40,6 +39,34 @@ macro_rules! vectors {
                     sum
                 }
 
+                #[inline]
+                pub fn magnitude_squared(&self) -> $t {
+                    let mut magnitude = <$t>::default();
+                    for i in 0..$d {
+                        magnitude += self.data[i] * self.data[i];
+                    }
+                    magnitude
+                }
+
+                #[inline]
+                pub fn magnitude(&self) -> $t {
+                    self.magnitude_squared().sqrt()
+                }
+
+                #[inline]
+                pub fn normalize(&mut self) {
+                    let magnitude = self.magnitude();
+                    for i in 0..$d {
+                        self.data[i] /= magnitude;
+                    }
+                }
+
+                #[inline]
+                pub fn normalized(&self) -> Self {
+                    let mut vector = self.clone();
+                    vector.normalize();
+                    vector
+                }
             }
 
             impl Add for $n {
@@ -217,6 +244,22 @@ macro_rules! letters_for_vectors {
     }
 }
 
+// this is a temporary macro to implement the cross product only for the Vec3
+macro_rules! cross_product {
+    ($n:ident) => {
+        impl $n {
+            #[inline]
+            pub fn cross(&self, other: &$n) -> $n {
+                let mut data = self.data.clone();
+                data[0] = self.x().mul_add(other.z(), -self.z() * other.y());
+                data[1] = self.y().mul_add(other.x(), -self.x() * other.z());
+                data[2] = self.z().mul_add(other.y(), -self.y() * other.x());
+                $n::new(data)
+            }
+        }
+    }
+}
+
 // define vectors and implement basics
 // ($($n:ident => [$t:ty; $d:expr]),+)
 vectors! {
@@ -237,3 +280,5 @@ letters_for_vectors! {
     Vec3 => [0 => x, 1 => y, 2 => z] {f32},
     Vec4 => [0 => x, 1 => y, 2 => z, 3 => w] {f32}
 }
+
+cross_product!(Vec3);

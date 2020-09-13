@@ -4,7 +4,7 @@ mod vec;
 #[cfg(test)]
 mod tests {
     use super::vec::*;
-    use std::ops::{Neg, Not};
+    use std::ops::{Neg};
 
     #[test]
     fn create_vectors() {
@@ -43,5 +43,15 @@ mod tests {
 
         assert_eq!(vec_1, vec_2);
         assert_eq!(vec_3.data, [-2.0, -6.0, -2.0])
+    }
+
+    #[test]
+    fn normalize_vectors() {
+        let mut vec_1 = Vec3::new([2.0, 3.0, 1.0]);
+        let vec_1_normalized = vec_1.normalized();
+        vec_1.normalize();
+
+        assert_eq!(vec_1.data, [0.5345225, 0.8017837, 0.26726124]);
+        assert_eq!(vec_1, vec_1_normalized);
     }
 }

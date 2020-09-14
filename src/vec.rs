@@ -3,17 +3,36 @@
 use std::ops::{Add, AddAssign, Sub, SubAssign, Mul, MulAssign, Div, DivAssign, Neg};
 use paste::paste;
 
+
+/// A macro to create Vector Types fast
+///
+/// # Usage
+/// * `<...>` : replace with values
+/// * `,+` can repeate infinite times
+///
+/// `<Vector Name> => [<type of Vector: T>; <Dimension of Vector>],+`
+///
+/// # Example
+/// ```
+/// vectors! {
+///     Vec2 => [f32; 2],
+///     Vec3 => [f32; 3],
+/// }
+/// ```
 #[macro_export]
 macro_rules! vectors {
     ($($n:ident => [$t:ty; $d:expr]),+) => {
         $(
+            /// A n-dimensional vector with type T (default T: f32)
             #[derive(Clone, Copy, Debug, Default, PartialEq)]
             #[repr(C)]
             pub struct $n {
                 pub data: [$t; $d]
             }
 
+
             impl $n {
+                /// constructs a new VecN from `[T; N]`
                 #[inline]
                 pub const fn new(data: [$t; $d]) -> Self {
                     Self {
@@ -21,6 +40,8 @@ macro_rules! vectors {
                     }
                 }
 
+                /// constructs a new VecN with all values being value: T
+                #[inline]
                 pub const fn broadcast(value: $t) -> Self {
                     let data = [value; $d];
                     Self {
@@ -28,6 +49,7 @@ macro_rules! vectors {
                     }
                 }
 
+                /// constructs a new VecN with the nth value being 1, and the rest 0
                 #[inline]
                 pub fn unit_n(n: usize) -> Self {
                     let mut data = [<$t>::default(); $d];
@@ -37,6 +59,7 @@ macro_rules! vectors {
                     }
                 }
 
+                /// Dot product of two VecN
                 #[inline]
                 pub fn dot(&self, other: Self) -> $t {
                     let mut sum = self.data[0] * other.data[0];
@@ -46,6 +69,7 @@ macro_rules! vectors {
                     sum
                 }
 
+                /// calculates the squared magnitude
                 #[inline]
                 pub fn magnitude_squared(&self) -> $t {
                     let mut magnitude = <$t>::default();
@@ -55,11 +79,13 @@ macro_rules! vectors {
                     magnitude
                 }
 
+                /// calculates the magnitude
                 #[inline]
                 pub fn magnitude(&self) -> $t {
                     self.magnitude_squared().sqrt()
                 }
 
+                /// normalizes the values of the vector
                 #[inline]
                 pub fn normalize(&mut self) {
                     let magnitude = self.magnitude();
@@ -68,6 +94,7 @@ macro_rules! vectors {
                     }
                 }
 
+                /// returns a normalized VecN' without consuming VecN
                 #[inline]
                 pub fn normalized(&self) -> Self {
                     let mut vector = self.clone();
@@ -75,11 +102,13 @@ macro_rules! vectors {
                     vector
                 }
 
+                /// reverses the values of the vector
                 #[inline]
                 pub fn reverse(&mut self) {
                     self.data.reverse();
                 }
 
+                /// returns a reversed VecN' without consuming VecN
                 #[inline]
                 pub fn reversed(&self) -> Self {
                     let mut vector = self.clone();
@@ -87,6 +116,7 @@ macro_rules! vectors {
                     vector
                 }
 
+                /// set each value within a VecN absolute
                 #[inline]
                 pub fn abs(&mut self) {
                     for i in 0..$d {
@@ -94,6 +124,7 @@ macro_rules! vectors {
                     }
                 }
 
+                /// returns a VecN' with only absolute values without consuming VecN
                 #[inline]
                 pub fn absd(&self) -> Self {
                     let mut vector = self.clone();
@@ -101,11 +132,13 @@ macro_rules! vectors {
                     vector
                 }
 
+                /// reflect VecN by a NormalN
                 #[inline]
                 pub fn reflect(&mut self, normal: Self) {
                     *self -= 2 as $t * self.dot(normal) * normal;
                 }
 
+                /// return the reflected VecN' by a NormalN without consuming VecN
                 #[inline]
                 pub fn reflected(&self, normal: $n) -> Self {
                     let mut vector = *self;
@@ -113,6 +146,7 @@ macro_rules! vectors {
                     vector
                 }
 
+                /// clamps the values of a VecN
                 #[inline]
                 pub fn clamp(&mut self, min: Self, max: Self) {
                     for i in 0..$d {
@@ -120,16 +154,17 @@ macro_rules! vectors {
                     }
                 }
 
+                /// returns a VecN' with clamped values without consuming VecN
                 #[inline]
                 pub fn clamped(&self, min: Self, max: Self) -> Self {
-                    let mut vector = self.clone();
+                    let mut vector = *self;
                     vector.clamp(min, max);
                     vector
                 }
 
                #[inline]
                 pub fn map<F: Fn($t) -> $t>(&self, f: F) -> Self {
-                    let mut vector = self.clone();
+                    let mut vector = *self;
                     for i in 0..$d {
                         vector.data[i] = f(vector.data[i]);
                     }
@@ -143,27 +178,33 @@ macro_rules! vectors {
                     }
                 }
 
+                /// returns a new VecN' with each component having the bigger number from either VecN1 or VecN2
                 #[inline]
-                pub fn max_by_component(mut self, other: Self) -> Self {
+                pub fn max_by_component(&self, other: &Self) -> Self {
+                   let mut vector = *self;
                    for i in 0..$d {
-                        self.data[i] = self.data[i].max(other.data[i]);
+                        vector.data[i] = self.data[i].max(other.data[i]);
                    }
-                   self
+                   vector
                 }
 
+                /// returns a new VecN' with each component having the smaller number from either VecN1 or VecN2
                 #[inline]
-                pub fn min_by_component(mut self, other: Self) -> Self {
+                pub fn min_by_component(&self, other: &Self) -> Self {
+                   let mut vector = *self;
                    for i in 0..$d {
-                        self.data[i] = self.data[i].min(other.data[i]);
+                        vector.data[i] = self.data[i].min(other.data[i]);
                    }
-                   self
+                   vector
                 }
 
+                /// constructs a new VecN with all values being 0
                 #[inline]
                 pub fn zero() -> Self {
                     Self::broadcast(0 as $t)
                 }
 
+                /// constructs a new VecN with all values being 1
                 #[inline]
                 pub fn one() -> Self {
                     Self::broadcast(1 as $t)
@@ -212,8 +253,7 @@ macro_rules! vectors {
                 }
             }
 
-            // Mul is maybe a little bit weird to have for vectors but it may come in handy?
-            // maybe replace this with the dot or cross product?
+            /// Multiplication of Vector * Vector is a bit weird but it may come in as a nice to have.
             impl Mul for $n {
                 type Output = Self;
                 #[inline]
@@ -272,7 +312,7 @@ macro_rules! vectors {
                 }
             }
 
-            // Div is maybe a little bit weird to have for vectors but it may come in handy?
+            /// Division of Vector / Vector is a bit weird but it may come in as a nice to have.
             impl Div for $n {
                 type Output = Self;
                 #[inline]
@@ -285,6 +325,7 @@ macro_rules! vectors {
                 }
             }
 
+            /// vec' := vec1 /= vec2
             impl DivAssign for $n {
                 #[inline]
                 fn div_assign(&mut self, other: $n) {
@@ -294,6 +335,7 @@ macro_rules! vectors {
                 }
             }
 
+            /// vec' := vec /= scalar
             impl DivAssign<$t> for $n {
                 #[inline]
                 fn div_assign(&mut self, other: $t) {
@@ -303,6 +345,7 @@ macro_rules! vectors {
                 }
             }
 
+            /// -vec = -1 * vec
             impl Neg for $n {
                 type Output = $n;
                 #[inline]
@@ -314,25 +357,41 @@ macro_rules! vectors {
     }
 }
 
-// This macro makes working with vectors easier by adding letters
+/// A macro to add lettered getter and setter functions to a VecN
+///
+/// # Usage
+/// * `<...>` : replace with values
+/// * `,+` can repeate infinite times
+///
+/// `<Vector Name> => [<<index for data[n]> => <corresponding letter>>,+] <{type of Vector: T}>,+`
+///
+/// # Example
+/// ```
+/// letters_for_vectors! {
+///     Vec2 => [0 => x, 1 => y] {f32},
+///     Vec3 => [0 => x, 1 => y, 2 => z] {f32}
+/// }
+/// ```
 #[macro_export]
 macro_rules! letters_for_vectors {
     ($($n:ident => [$($c:expr => $d:ident),+]  {$t:ty}),+) => {
         $(
              impl $n {
                 $(
+                    /// Returns `data[n]` from the corresponding letter
                     #[inline]
                     pub const fn $d(&self) -> $t{
                         self.data[$c]
                     }
 
                     paste! {
-                        // Create a new unit vector $d
+                        /// sets the `data[n]` to the value f
                         #[inline]
                         pub fn [<set_ $d>](&mut self, value: $t) {
                             self.data[$c] = value;
                         }
 
+                        // Creates a new unit vector from the corresponding letter
                         #[inline]
                         pub fn [<unit_ $d>]() -> $n {
                             Self {
@@ -346,6 +405,21 @@ macro_rules! letters_for_vectors {
     }
 }
 
+/// A macro to get Vec(n-1) from Vec(n) by using lettered functions
+///
+/// # Usage
+/// * `<...>` : replace with values
+/// * `,+` can repeate infinite times
+///
+/// `<VectorN Name> => <VectorN-1> from <{letter(s)} => [<indices for data[n]>,+]}>,+>,+`
+///
+/// # Example
+/// ```
+/// vectors_from_letters! {
+///     Vec3 => Vec2 from {xy => [0, 1], xz => [0, 2], zy => [1, 2]},
+///     Vec4 => Vec3 from {xyz => [0, 1, 2], xyw => [0, 1, 3], xzw => [0, 2, 3], yzw => [1, 2, 3]}
+/// }
+/// ```
 #[macro_export]
 macro_rules! vectors_from_letters {
     ($($n:ident => $m:ident from {$($v:ident => $d:expr),+}),+) => {
@@ -384,8 +458,6 @@ macro_rules! cross_product {
     }
 }
 
-// define vectors and implement basics
-// ($($n:ident => [$t:ty; $d:expr]),+)
 vectors! {
     Vec1 => [f32; 1],
     Vec2 => [f32; 2],
@@ -397,7 +469,6 @@ vectors! {
     Vec8 => [f32; 8]
 }
 
-// impl some letters for vectors
 letters_for_vectors! {
     Vec1 => [0 => x] {f32},
     Vec2 => [0 => x, 1 => y] {f32},

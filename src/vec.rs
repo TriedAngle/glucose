@@ -8,7 +8,7 @@ use paste::paste;
 ///
 /// # Usage
 /// * `<...>` : replace with values
-/// * `,+` can repeate infinite times
+/// * `,+` / `;+` can repeat infinite times but can not be empty
 ///
 /// `<Vector Name> => [<type of Vector: T>; <Dimension of Vector>],+`
 ///
@@ -361,7 +361,7 @@ macro_rules! vectors {
 ///
 /// # Usage
 /// * `<...>` : replace with values
-/// * `,+` can repeate infinite times
+/// * `,+` can repeat infinite times but can not be empty
 ///
 /// `<Vector Name> => [<<index for data[n]> => <corresponding letter>>,+] <{type of Vector: T}>,+`
 ///
@@ -409,7 +409,7 @@ macro_rules! letters_for_vectors {
 ///
 /// # Usage
 /// * `<...>` : replace with values
-/// * `,+` can repeate infinite times
+/// * `,+` can repeat infinite times
 ///
 /// `<VectorN Name> => <VectorN-1> from <{letter(s)} => [<indices for data[n]>,+]}>,+>,+`
 ///
@@ -441,6 +441,60 @@ macro_rules! vectors_from_letters {
     }
 }
 
+/// A macro to convert between Vectors
+///
+/// # Usage
+/// * `<...>` : replace with values
+/// * `,+` / `;+` can repeat infinite times but can not be empty with
+/// * `,*` / `;*` can repeat infinite times and can be empty with
+///
+/// * Before the first `=>`: all vectors bigger than the target vector
+/// * Between the first and the secodn `=>`: target vector
+/// * After the second `=>`: all vectors smaller than the target vector
+///
+/// `[<<Vector Name>, <Dimension>>;*] => [<<Vector Name>, <Dimension>>] {type} => [<<Vector Name>, <Dimension>>;*],+`
+///
+/// # Example
+/// ```
+/// vectors_from_letters! {
+/// [Vec4, 4; Vec3, 3] => [Vec2, 2] {f32} => [Vec1, 1],
+/// [Vec5, 5; Vec4, 4] => [Vec3, 3] {f32} => [Vec2, 2; Vec1, 1],
+/// [] => [Vec4, 4] {f32} => [Vec3, 3; Vec2, 2; Vec1, 1],
+/// }
+/// ```
+#[macro_export]
+macro_rules! vector_to_vector {
+    ($([$($ob:ident, $obd:expr);*] => [$n:ident, $d:expr] {$t:ty} => [$($os:ident, $osd:expr);*]),+) => {
+        $(
+            $(
+                impl From<$ob> for $n {
+                    #[inline]
+                    fn from(vec: $ob) -> $n {
+                        let mut data = [1 as $t; $d];
+                        for i in 0..$d {
+                            data[i] = vec.data[i];
+                        }
+                        Self::new(data)
+                    }
+                }
+            )*
+
+            $(
+                impl From<$os> for $n {
+                    #[inline]
+                    fn from(vec: $os) -> $n {
+                        let mut data = [1 as $t; $d];
+                        for i in 0..$osd {
+                            data[i] = vec.data[i];
+                        }
+                        Self::new(data)
+                    }
+                }
+            )*
+        )+
+    }
+}
+
 // this is a temporary macro to implement the cross product only for the Vec3
 #[macro_export]
 macro_rules! cross_product {
@@ -468,6 +522,18 @@ vectors! {
     Vec7 => [f32; 7],
     Vec8 => [f32; 8]
 }
+
+vector_to_vector!{
+    [Vec8, 8; Vec7, 7; Vec6, 6; Vec5, 5; Vec4, 4; Vec3, 3; Vec2, 2] => [Vec1, 1] {f32} => [],
+    [Vec8, 8; Vec7, 7; Vec6, 6; Vec5, 5; Vec4, 4; Vec3, 3] => [Vec2, 2] {f32} => [Vec1, 1],
+    [Vec8, 8; Vec7, 7; Vec6, 6; Vec5, 5; Vec4, 4] => [Vec3, 3] {f32} => [Vec2, 2; Vec1, 1],
+    [Vec8, 8; Vec7, 7; Vec6, 6; Vec5, 5] => [Vec4, 4] {f32} => [Vec3, 3; Vec2, 2; Vec1, 1],
+    [Vec8, 8; Vec7, 7; Vec6, 6] => [Vec5, 5] {f32} => [Vec4, 4; Vec3, 3; Vec2, 2; Vec1, 1],
+    [Vec8, 8; Vec7, 7] => [Vec6, 6] {f32} => [Vec5, 5; Vec4, 4; Vec3, 3; Vec2, 2; Vec1, 1],
+    [Vec8, 8] => [Vec7, 7] {f32} => [Vec6, 6; Vec5, 5; Vec4, 4; Vec3, 3; Vec2, 2; Vec1, 1],
+    [] => [Vec8, 8] {f32} => [Vec7, 7; Vec6, 6; Vec5, 5; Vec4, 4; Vec3, 3; Vec2, 2; Vec1, 1]
+}
+
 
 letters_for_vectors! {
     Vec1 => [0 => x] {f32},

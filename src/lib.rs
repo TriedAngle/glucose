@@ -1,5 +1,5 @@
-mod mat;
-mod vec;
+pub mod mat;
+pub mod vec;
 
 #[cfg(test)]
 mod tests {
@@ -63,5 +63,26 @@ mod tests {
         let vec_4 = vec_2.yzw();
         assert_eq!(vec_3.data, [2.0, 3.0]);
         assert_eq!(vec_4.data, [3.0, 1.0, 1.4]);
+    }
+
+    #[test]
+    fn from_into_vectors() {
+        let vec_1 = Vec2::new([2.0, 3.0]);
+        let vec_2: Vec3 = Vec3::from(vec_1);
+        let vec_3: Vec3 = vec_1.into();
+        assert_eq!(vec_2.data, [2.0, 3.0, 1.0]);
+        assert_eq!(vec_3.data, [2.0, 3.0, 1.0]);
+
+        let vec_11 = Vec3::new([3.0, 1.0, 3.0]);
+        let vec_12: Vec2 = Vec2::from(vec_11);
+        let vec_13: Vec2 = vec_11.into();
+        assert_eq!(vec_12.data, [3.0, 1.0]);
+        assert_eq!(vec_13.data, [3.0, 1.0]);
+
+        let vec_11 = Vec4::new([3.0, 1.0, 2.0, 0.0]);
+        let vec_12: Vec2 = Vec2::from(vec_11);
+        let vec_13: Vec2 = vec_11.into();
+        assert_eq!(vec_12.data, [3.0, 1.0]);
+        assert_eq!(vec_13.data, [3.0, 1.0]);
     }
 }

@@ -4,13 +4,13 @@ pub mod vec;
 #[cfg(test)]
 mod tests {
     use super::vec::*;
+    use super::mat::*;
     use std::ops::{Neg};
 
     #[test]
     fn create_vectors() {
         let vec_1 = Vec3::new([0.0, 1.0, 2.0]);
         let vec_2 = Vec3::unit_y();
-
         assert_eq!(vec_1.data, [0.0, 1.0, 2.0]);
         assert_eq!(vec_2.data, [0.0, 1.0, 0.0]);
     }
@@ -84,5 +84,12 @@ mod tests {
         let vec_13: Vec2 = vec_11.into();
         assert_eq!(vec_12.data, [3.0, 1.0]);
         assert_eq!(vec_13.data, [3.0, 1.0]);
+    }
+
+    #[test]
+    fn matrix_creation() {
+        let mat_1 = Mat4::new_identity();
+
+        println!("{:?}", mat_1);
     }
 }

@@ -1,53 +1,55 @@
 #![allow(dead_code)]
 
-// use crate::vec::{Vec1, Vec2, Vec3, Vec4, Vec5, Vec6, Vec7, Vec8};
+use crate::vec::Vector;
+use crate::traits::MathComponent;
 
-// #[macro_export]
-// macro_rules! matrices {
-//     ($($n:ident {$t:ty}=> [$tv:ty; $d:expr]),+) => {
-//         $(
-//             #[derive(Clone, Copy, Debug, Default)]
-//             #[repr(C)]
-//             pub struct $n {
-//                 pub data: [$tv; $d]
-//             }
-//
-//             impl $n {
-//                 #[inline]
-//                 pub const fn new(data: [$tv; $d]) -> Self {
-//                     Self {
-//                         data,
-//                     }
-//                 }
-//
-//                 #[inline]
-//                 pub fn new_identity() -> Self {
-//                     let mut matrix = Self::zero();
-//                     for i in 0..$d {
-//                         matrix.data[i].data[i] = 1 as $t
-//                     }
-//                     matrix
-//                 }
-//
-//                 pub fn determinant(&self) -> $t {
-//
-//                 }
-//
-//                 pub fn zero() -> Self {
-//                     Self::new([<$tv>::zero(); $d])
-//                 }
-//             }
-//         )+
-//     }
-// }
+pub type SquareMatrix<T, const N: usize> = Matrix<T, { N }, { N }>;
 
-// matrices! {
-//     Mat1 {f32} => [Vec1; 1],
-//     Mat2 {f32} => [Vec2; 2],
-//     Mat3 {f32} => [Vec3; 3],
-//     Mat4 {f32} => [Vec4; 4],
-//     Mat5 {f32} => [Vec5; 5],
-//     Mat6 {f32} => [Vec6; 6],
-//     Mat7 {f32} => [Vec7; 7],
-//     Mat8 {f32} => [Vec8; 8]
-// }
+#[derive(Debug)]
+pub struct Matrix<T, const N: usize, const M: usize> {
+    data: [[T; M]; N]
+}
+
+impl<T, const N: usize, const M: usize> Matrix<T, { N }, { M }> {
+    pub fn new(data: [[T; M]; N]) -> Self {
+        Self {
+            data,
+        }
+    }
+
+    pub fn len(&self) -> usize {
+        M * N
+    }
+}
+
+impl<T: MathComponent<T> + Copy, const N: usize, const M: usize> Matrix<T, { N }, { M }> {
+    pub fn zero() -> Self {
+        Self {
+            data: [[<T>::zero(); M]; N]
+        }
+    }
+}
+
+impl<T: MathComponent<T> + Copy, const N: usize> SquareMatrix<T, { N }> {
+    pub fn new_identity() -> Self {
+        let mut data = [[<T>::zero(); N]; N];
+        for i in 0..N {
+            data[i][i] = <T>::one();
+        }
+        Self {
+            data
+        }
+    }
+}
+
+impl<T: Copy, const N: usize, const M: usize> Matrix<T, { N }, { M }> {
+    pub fn to_vectors(&self) -> Vec<Vector<T, { M }>> {
+        self.data.iter().map(|col| Vector::new(*col)).collect()
+    }
+}
+
+#[test]
+fn test() {
+    let mat = SquareMatrix::<f32, 3>::new_identity();
+    println!("{:?}", mat);
+}

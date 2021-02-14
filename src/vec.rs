@@ -1,8 +1,8 @@
 use std::ops::{Add, Mul, Div, Sub, AddAssign, SubAssign, MulAssign, DivAssign};
-use crate::traits::VectorComponent;
+use crate::traits::MathComponent;
 
 #[derive(Debug)]
-struct Vector<T, const N: usize> {
+pub struct Vector<T, const N: usize> {
     data: [T; N],
 }
 
@@ -35,7 +35,15 @@ impl<T: Copy, const N: usize> Vector<T, { N }> {
     }
 }
 
-impl<T: VectorComponent<T> + Default + Copy + AddAssign + Mul<Output=T>, const N: usize> Vector<T, { N }> {
+impl<T: MathComponent<T> + Copy, const N: usize> Vector<T, { N }> {
+    pub fn zero() -> Self {
+        Self {
+            data: [<T>::zero(); N]
+        }
+    }
+}
+
+impl<T: MathComponent<T> + Default + Copy + AddAssign + Mul<Output=T>, const N: usize> Vector<T, { N }> {
     #[inline]
     pub fn dot(&self, other: Self) -> T {
         let mut sum = <T>::default();
@@ -186,30 +194,6 @@ impl<T: Default + DivAssign + Copy, const N: usize> DivAssign<T> for Vector<T, {
     }
 }
 
-// impl<T: Default + Mul + Copy, const N: usize> Mul<Vec<T, { N }>> for T {
-//     type Output = Vec<T, { N }>;
-//     fn mul(self, rhs: Vec<T, { N }>) -> Vec<T, { N }> {
-//         let mut data = [<T>::default(); N];
-//         for i in 0..N {
-//             data[i] = rhs.data[i] * self;
-//         }
-//         Vec { data }
-//     }
-// }
-//
-// impl<T: Default + Div + Copy, const N: usize> Div<Vec<T, { N }>> for T {
-//     type Output = Vec<T, { N }>;
-//     fn div(self, rhs: Vec<T, { N }>) -> Self::Output {
-//         let mut data = [<T>::default(); N];
-//         for i in 0..N {
-//             data[i] = rhs.data[i] * self;
-//         }
-//         Self { data }
-//     }
-// }
-
-
-
 macro_rules! vec_short {
     ($($n:ident => $t:ty),+) => {
         $(
@@ -219,6 +203,11 @@ macro_rules! vec_short {
     ($($n:ident => $d:expr),+) => {
         $(
             type $n<T> = Vector<T, $d>;
+        )+
+    };
+    ($($n:ident => [$t:ty; $d:expr]),+) => {
+        $(
+            type $n = Vector<$t, $d>;
         )+
     }
 }

@@ -1,5 +1,6 @@
 use std::ops::{Add, Mul, Div, Sub, AddAssign, SubAssign, MulAssign, DivAssign};
 use crate::traits::MathComponent;
+use paste::paste;
 
 #[derive(Debug, Copy, Clone)]
 pub struct Vector<T, const N: usize> {
@@ -324,6 +325,50 @@ macro_rules! vec_short {
     }
 }
 
+/// A macro to add lettered getter and setter functions to a VecN
+///
+/// # Usage
+/// * `<...>` : replace with values
+/// * `,+` can repeat infinite times but can not be empty
+///
+/// `<Vector Dimension> => [<<index for data[n]> => <corresponding letter>>,+],+`
+///
+/// # Example
+/// ```
+/// letters_for_vectors! {
+///     2 => [0, x; 1, y],
+///     3 => [0, x; 1, y; 2, z]
+/// }
+/// ```
+// TODO: add recursive parsing so the inner expression can be omitted
+macro_rules! letters_for_vectors {
+    ($($e:expr => [$($c:expr, $d:ident);+]),+) => {
+        $(
+            impl<T: MathComponent<T> + Copy> Vector<T, $e> {
+                $(
+                    pub fn $d(&self) -> T {
+                        self.data[$c]
+                    }
+
+                    paste! {
+                        /// sets the `data[n]` to the value f
+                        #[inline]
+                        pub fn [<set_ $d>](&mut self, value: T) {
+                            self.data[$c] = value;
+                        }
+
+                        // Creates a new unit vector from the corresponding letter
+                        #[inline]
+                        pub fn [<unit_ $d>]() -> Self {
+                            Self::unit($c)
+                        }
+                    }
+
+                )+
+            }
+        )+
+    }
+}
 
 #[test]
 fn test() {
@@ -332,53 +377,6 @@ fn test() {
     println!("{:?}", vec);
     println!("{:?}", vec2);
 }
-// A macro to add lettered getter and setter functions to a VecN
-//
-// # Usage
-// * `<...>` : replace with values
-// * `,+` can repeat infinite times but can not be empty
-//
-// `<Vector Name> => [<<index for data[n]> => <corresponding letter>>,+] <{type of Vector: T}>,+`
-//
-// # Example
-// ```
-// letters_for_vectors! {
-//     Vec2 => [0 => x, 1 => y] {f32},
-//     Vec3 => [0 => x, 1 => y, 2 => z] {f32}
-// }
-// ```
-// #[macro_export]
-// macro_rules! letters_for_vectors {
-//     ($($n:ident => [$($c:expr => $d:ident),+]  {$t:ty}),+) => {
-//         $(
-//              impl $n {
-//                 $(
-//                     /// Returns `data[n]` from the corresponding letter
-//                     #[inline]
-//                     pub const fn $d(&self) -> $t{
-//                         self.data[$c]
-//                     }
-//
-//                     paste! {
-//                         /// sets the `data[n]` to the value f
-//                         #[inline]
-//                         pub fn [<set_ $d>](&mut self, value: $t) {
-//                             self.data[$c] = value;
-//                         }
-//
-//                         // Creates a new unit vector from the corresponding letter
-//                         #[inline]
-//                         pub fn [<unit_ $d>]() -> $n {
-//                             Self {
-//                                 data: $n::unit_n($c).data
-//                             }
-//                         }
-//                     }
-//                 )+
-//             }
-//         )+
-//     }
-// }
 
 // A macro to get Vec(n-1) from Vec(n) by using lettered functions
 //

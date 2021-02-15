@@ -1,10 +1,19 @@
-use std::ops::{AddAssign, Add, Sub, SubAssign, Mul, MulAssign, Div, DivAssign};
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 
 // I don't know if this is the `best` solution yet, but I do not like to write everything 10x
 // so this should do for now
 // this does not implement `Copy` because maybe some other types are `Clone` only.
-pub trait MathComponent<T>: Default + Add<Output=T> + AddAssign + Sub<Output=T> + SubAssign
-    + Mul<Output=T> + MulAssign + Div<Output=T> + DivAssign {
+pub trait MathComponent<T>:
+    Default
+    + Add<Output = T>
+    + AddAssign
+    + Sub<Output = T>
+    + SubAssign
+    + Mul<Output = T>
+    + MulAssign
+    + Div<Output = T>
+    + DivAssign
+{
     fn sqrt(&self) -> T;
     fn zero() -> T;
     fn one() -> T;

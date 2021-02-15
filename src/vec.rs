@@ -171,6 +171,31 @@ impl<T: MathComponent<T> + Copy, const N: usize> Vector<T, { N }> {
     }
 }
 
+// this seems a bit slow, maybe find a better way?
+impl<T: Default + Copy, const N: usize> Vector<T, { N }> {
+    fn from<const M: usize>(rhs: Vector<T, { M }>) -> Self {
+        if N == M {
+            // I have no idea how to cast Array of size M to size N
+            // this works for now I guess?
+            let pointer = &rhs.data as *const T;
+            let data: [T; N] = unsafe { *pointer.cast() };
+            Self::new(data)
+        } else if N > M {
+            let mut data = [<T>::default(); N];
+            for i in 0..M {
+                data[i] = rhs.data[i];
+            }
+            Self::new(data)
+        } else {
+            let mut data = [<T>::default(); N];
+            for i in 0..N {
+                data[i] = rhs.data[i];
+            }
+            Self::new(data)
+        }
+    }
+}
+
 impl<T, const N: usize> From<[T; N]> for Vector<T, { N }> {
     fn from(arr: [T; N]) -> Self {
         Self { data: arr }
@@ -372,10 +397,14 @@ macro_rules! letters_for_vectors {
 
 #[test]
 fn test() {
-    let vec = Vector::new([1.0, 3.0, 3.0]);
+    let vec = Vector::new([1.0, 3.0, 5.0]);
     let vec2 = vec.normalized();
+    let vec3: Vector<f64, 4> = Vector::from(vec);
+    let vec4: Vector<f64, 3> = Vector::from(vec);
     println!("{:?}", vec);
     println!("{:?}", vec2);
+    println!("{:?}", vec3);
+    println!("{:?}", vec4);
 }
 
 // A macro to get Vec(n-1) from Vec(n) by using lettered functions

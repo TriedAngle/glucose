@@ -1,4 +1,4 @@
-pub trait MathComponent<T> {
+pub trait MathComponent<T>: Default {
     fn sqrt(&self) -> T;
     fn zero() -> T;
     fn one() -> T;

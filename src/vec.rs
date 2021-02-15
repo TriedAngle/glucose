@@ -41,9 +41,17 @@ impl<T: MathComponent<T> + Copy, const N: usize> Vector<T, { N }> {
             data: [<T>::zero(); N]
         }
     }
+
+    pub fn unit(n: usize) -> Self {
+        let mut data = [<T>::default(); N];
+        data[n] = <T>::one();
+        Self {
+            data
+        }
+    }
 }
 
-impl<T: MathComponent<T> + Default + Copy + AddAssign + Mul<Output=T>, const N: usize> Vector<T, { N }> {
+impl<T: MathComponent<T> + Copy + AddAssign + Mul<Output=T>, const N: usize> Vector<T, { N }> {
     #[inline]
     pub fn dot(&self, other: Self) -> T {
         let mut sum = <T>::default();
@@ -239,42 +247,6 @@ fn test() {
 // macro_rules! vectors {
 //     ($($n:ident => [$t:ty; $d:expr]),+) => {
 //         $(
-//             /// A n-dimensional vector with type T (default T: f32)
-//             #[derive(Clone, Copy, Debug, Default, PartialEq)]
-//             #[repr(C)]
-//             pub struct $n {
-//                 pub data: [$t; $d]
-//             }
-//
-//
-//             impl $n {
-//                 /// constructs a new VecN from `[T; N]`
-//                 #[inline]
-//                 pub const fn new(data: [$t; $d]) -> Self {
-//                     Self {
-//                         data,
-//                     }
-//                 }
-//
-//                 /// constructs a new VecN with all values being value: T
-//                 #[inline]
-//                 pub const fn broadcast(value: $t) -> Self {
-//                     let data = [value; $d];
-//                     Self {
-//                         data,
-//                     }
-//                 }
-//
-//                 /// constructs a new VecN with the nth value being 1, and the rest 0
-//                 #[inline]
-//                 pub fn unit_n(n: usize) -> Self {
-//                     let mut data = [<$t>::default(); $d];
-//                     data[n] = 1 as $t;
-//                     Self {
-//                         data,
-//                     }
-//                 }
-//
 //                 /// Dot product of two VecN
 //                 #[inline]
 //                 pub fn dot(&self, other: Self) -> $t {
@@ -285,21 +257,6 @@ fn test() {
 //                     sum
 //                 }
 //
-//                 /// calculates the squared magnitude
-//                 #[inline]
-//                 pub fn magnitude_squared(&self) -> $t {
-//                     let mut magnitude = <$t>::default();
-//                     for i in 0..$d {
-//                         magnitude += self.data[i] * self.data[i];
-//                     }
-//                     magnitude
-//                 }
-//
-//                 /// calculates the magnitude
-//                 #[inline]
-//                 pub fn magnitude(&self) -> $t {
-//                     self.magnitude_squared().sqrt()
-//                 }
 //
 //                 /// normalizes the values of the vector
 //                 #[inline]

@@ -50,6 +50,6 @@ impl<T: Copy, const N: usize, const M: usize> Matrix<T, { N }, { M }> {
 
 #[test]
 fn test() {
-    let mat = SquareMatrix::<f32, 3>::new_identity();
+    let mat = Matrix::<f32, 3, 3>::new_identity();
     println!("{:?}", mat);
 }

@@ -1,7 +1,7 @@
 use std::ops::{Add, Mul, Div, Sub, AddAssign, SubAssign, MulAssign, DivAssign};
 use crate::traits::MathComponent;
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct Vector<T, const N: usize> {
     data: [T; N],
 }
@@ -36,12 +36,6 @@ impl<T: Copy, const N: usize> Vector<T, { N }> {
 }
 
 impl<T: MathComponent<T> + Copy, const N: usize> Vector<T, { N }> {
-    pub fn zero() -> Self {
-        Self {
-            data: [<T>::zero(); N]
-        }
-    }
-
     pub fn unit(n: usize) -> Self {
         let mut data = [<T>::default(); N];
         data[n] = <T>::one();
@@ -49,9 +43,7 @@ impl<T: MathComponent<T> + Copy, const N: usize> Vector<T, { N }> {
             data
         }
     }
-}
 
-impl<T: MathComponent<T> + Copy + AddAssign + Mul<Output=T>, const N: usize> Vector<T, { N }> {
     #[inline]
     pub fn dot(&self, other: Self) -> T {
         let mut sum = <T>::default();
@@ -74,6 +66,108 @@ impl<T: MathComponent<T> + Copy + AddAssign + Mul<Output=T>, const N: usize> Vec
     pub fn magnitude(&self) -> T {
         self.magnitude_squared().sqrt()
     }
+
+    #[inline]
+    pub fn normalize(&mut self) {
+        let magnitude = self.magnitude();
+        self.data.iter_mut().for_each(|e| *e /= magnitude);
+    }
+
+    #[inline]
+    pub fn normalized(&self) -> Self {
+        let mut vec = *self;
+        vec.normalize();
+        vec
+    }
+
+    #[inline]
+    pub fn reverse(&mut self) {
+        self.data.reverse()
+    }
+
+    #[inline]
+    pub fn reversed(&self) -> Self {
+        let mut vec = *self;
+        vec.reverse();
+        vec
+    }
+
+    #[inline]
+    pub fn abs(&mut self) {
+        self.data.iter_mut().for_each(|e| *e = e.abs());
+    }
+
+    // I can't find a good name for this, expect a rename in the future
+    #[inline]
+    pub fn abs_copy(&self) -> Self {
+        let mut vec = *self;
+        vec.abs();
+        vec
+    }
+
+    #[inline]
+    pub fn reflect(&mut self, normal: Self) {
+        *self -= normal * <T>::from_i32(2) * self.dot(normal);
+    }
+
+    #[inline]
+    pub fn clamp(&mut self, min: Self, max: Self) {
+        for i in 0..N {
+            self.data[i] = self.data[i].maximum(min.data[i]).minimum(max.data[i])
+        }
+    }
+
+    /// returns a VecN' with clamped values without consuming VecN
+    #[inline]
+    pub fn clamped(&self, min: Self, max: Self) -> Self {
+        let mut vec = *self;
+        vec.clamp(min, max);
+        vec
+    }
+
+    #[inline]
+    pub fn map<F: Fn(T) -> T>(&self, f: F) -> Self {
+        let mut vector = *self;
+        vector.data.iter_mut().for_each(|e| *e = f(*e));
+        vector
+    }
+
+    #[inline]
+    pub fn apply<F: Fn(T) -> T>(&mut self, f: F) {
+        self.data.iter_mut().for_each(|e| *e = f(*e));
+    }
+
+    /// returns a new VecN' with each component having the bigger number from either VecN1 or VecN2
+    #[inline]
+    pub fn max_by_component(&self, other: &Self) -> Self {
+        let mut vector = *self;
+        for i in 0..N {
+            vector.data[i] = self.data[i].maximum(other.data[i]);
+        }
+        vector
+    }
+
+    /// returns a new VecN' with each component having the smaller number from either VecN1 or VecN2
+    #[inline]
+    pub fn min_by_component(&self, other: &Self) -> Self {
+        let mut vector = *self;
+        for i in 0..N {
+            vector.data[i] = self.data[i].minimum(other.data[i]);
+        }
+        vector
+    }
+
+    /// constructs a new VecN with all values being 0
+    #[inline]
+    pub fn zero() -> Self {
+        Self::broadcast(<T>::zero())
+    }
+
+    /// constructs a new VecN with all values being 1
+    #[inline]
+    pub fn one() -> Self {
+        Self::broadcast(<T>::one())
+    }
 }
 
 impl<T, const N: usize> From<[T; N]> for Vector<T, { N }> {
@@ -82,7 +176,7 @@ impl<T, const N: usize> From<[T; N]> for Vector<T, { N }> {
     }
 }
 
-impl<T: Default + Add<Output=T> + Copy, const N: usize> Add for Vector<T, { N }> {
+impl<T: MathComponent<T> + Copy, const N: usize> Add for Vector<T, { N }> {
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self::Output {
@@ -94,7 +188,7 @@ impl<T: Default + Add<Output=T> + Copy, const N: usize> Add for Vector<T, { N }>
     }
 }
 
-impl<T: Default + AddAssign + Copy, const N: usize> AddAssign for Vector<T, { N }> {
+impl<T: MathComponent<T> + Copy, const N: usize> AddAssign for Vector<T, { N }> {
     fn add_assign(&mut self, rhs: Self) {
         for i in 0..N {
             self.data[i] += rhs.data[i];
@@ -102,7 +196,7 @@ impl<T: Default + AddAssign + Copy, const N: usize> AddAssign for Vector<T, { N 
     }
 }
 
-impl<T: Default + Sub<Output=T> + Copy, const N: usize> Sub for Vector<T, { N }> {
+impl<T: MathComponent<T> + Copy, const N: usize> Sub for Vector<T, { N }> {
     type Output = Self;
 
     fn sub(self, rhs: Self) -> Self::Output {
@@ -114,7 +208,7 @@ impl<T: Default + Sub<Output=T> + Copy, const N: usize> Sub for Vector<T, { N }>
     }
 }
 
-impl<T: Default + SubAssign + Copy, const N: usize> SubAssign for Vector<T, { N }> {
+impl<T: MathComponent<T> + Copy, const N: usize> SubAssign for Vector<T, { N }> {
     fn sub_assign(&mut self, rhs: Self) {
         for i in 0..N {
             self.data[i] -= rhs.data[i];
@@ -122,7 +216,7 @@ impl<T: Default + SubAssign + Copy, const N: usize> SubAssign for Vector<T, { N 
     }
 }
 
-impl<T: Default + Mul<Output=T> + Copy, const N: usize> Mul for Vector<T, { N }> {
+impl<T: MathComponent<T> + Copy, const N: usize> Mul for Vector<T, { N }> {
     type Output = Self;
 
     fn mul(self, rhs: Self) -> Self::Output {
@@ -134,7 +228,7 @@ impl<T: Default + Mul<Output=T> + Copy, const N: usize> Mul for Vector<T, { N }>
     }
 }
 
-impl<T: Default + MulAssign + Copy, const N: usize> MulAssign for Vector<T, { N }> {
+impl<T: MathComponent<T> + Copy, const N: usize> MulAssign for Vector<T, { N }> {
     fn mul_assign(&mut self, rhs: Self) {
         for i in 0..N {
             self.data[i] *= rhs.data[i];
@@ -142,7 +236,7 @@ impl<T: Default + MulAssign + Copy, const N: usize> MulAssign for Vector<T, { N 
     }
 }
 
-impl<T: Default + Div<Output=T> + Copy, const N: usize> Div for Vector<T, { N }> {
+impl<T: MathComponent<T> + Copy, const N: usize> Div for Vector<T, { N }> {
     type Output = Self;
 
     fn div(self, rhs: Self) -> Self::Output {
@@ -154,7 +248,7 @@ impl<T: Default + Div<Output=T> + Copy, const N: usize> Div for Vector<T, { N }>
     }
 }
 
-impl<T: Default + DivAssign + Copy, const N: usize> DivAssign for Vector<T, { N }> {
+impl<T: MathComponent<T> + Copy, const N: usize> DivAssign for Vector<T, { N }> {
     fn div_assign(&mut self, rhs: Self) {
         for i in 0..N {
             self.data[i] /= rhs.data[i];
@@ -162,7 +256,7 @@ impl<T: Default + DivAssign + Copy, const N: usize> DivAssign for Vector<T, { N 
     }
 }
 
-impl<T: Default + Mul<Output=T> + Copy, const N: usize> Mul<T> for Vector<T, { N }> {
+impl<T: MathComponent<T> + Copy, const N: usize> Mul<T> for Vector<T, { N }> {
     type Output = Self;
 
     fn mul(self, rhs: T) -> Self::Output {
@@ -174,7 +268,7 @@ impl<T: Default + Mul<Output=T> + Copy, const N: usize> Mul<T> for Vector<T, { N
     }
 }
 
-impl<T: Default + MulAssign + Copy, const N: usize> MulAssign<T> for Vector<T, { N }> {
+impl<T: MathComponent<T> + Copy, const N: usize> MulAssign<T> for Vector<T, { N }> {
     fn mul_assign(&mut self, rhs: T) {
         for i in 0..N {
             self.data[i] *= rhs;
@@ -182,7 +276,7 @@ impl<T: Default + MulAssign + Copy, const N: usize> MulAssign<T> for Vector<T, {
     }
 }
 
-impl<T: Default + Div<Output=T> + Copy, const N: usize> Div<T> for Vector<T, { N }> {
+impl<T: MathComponent<T> + Copy, const N: usize> Div<T> for Vector<T, { N }> {
     type Output = Self;
 
     fn div(self, rhs: T) -> Self::Output {
@@ -194,13 +288,23 @@ impl<T: Default + Div<Output=T> + Copy, const N: usize> Div<T> for Vector<T, { N
     }
 }
 
-impl<T: Default + DivAssign + Copy, const N: usize> DivAssign<T> for Vector<T, { N }> {
+impl<T: MathComponent<T> + Copy, const N: usize> DivAssign<T> for Vector<T, { N }> {
     fn div_assign(&mut self, rhs: T) {
         for i in 0..N {
             self.data[i] /= rhs;
         }
     }
 }
+
+// impl<T: MathComponent<T>, const N: usize> Mul<Vector<T, { N }>> for T {
+//     type Output = Vector<T, { N }>;
+//
+//     fn mul(self, rhs: Vector<T, { N }>) -> Self::Output {
+//         let mut data = [<T>::default(); N];
+//         data.iter_mut().for_each(|e| *e *= self);
+//         Self { data }
+//     }
+// }
 
 macro_rules! vec_short {
     ($($n:ident => $t:ty),+) => {
@@ -224,312 +328,10 @@ macro_rules! vec_short {
 #[test]
 fn test() {
     let vec = Vector::new([1.0, 3.0, 3.0]);
-    let x = vec.magnitude();
-    println!("{:?}", x)
+    let vec2 = vec.normalized();
+    println!("{:?}", vec);
+    println!("{:?}", vec2);
 }
-
-// A macro to create Vector Types fast
-//
-// # Usage
-// * `<...>` : replace with values
-// * `,+` / `;+` can repeat infinite times but can not be empty
-//
-// `<Vector Name> => [<type of Vector: T>; <Dimension of Vector>],+`
-//
-// # Example
-// ```
-// vectors! {
-//     Vec2 => [f32; 2],
-//     Vec3 => [f32; 3],
-// }
-// ```
-// #[macro_export]
-// macro_rules! vectors {
-//     ($($n:ident => [$t:ty; $d:expr]),+) => {
-//         $(
-//                 /// Dot product of two VecN
-//                 #[inline]
-//                 pub fn dot(&self, other: Self) -> $t {
-//                     let mut sum = self.data[0] * other.data[0];
-//                     for i in 1..$d {
-//                         sum += self.data[i] * other.data[i];
-//                     }
-//                     sum
-//                 }
-//
-//
-//                 /// normalizes the values of the vector
-//                 #[inline]
-//                 pub fn normalize(&mut self) {
-//                     let magnitude = self.magnitude();
-//                     for i in 0..$d {
-//                         self.data[i] /= magnitude;
-//                     }
-//                 }
-//
-//                 /// returns a normalized VecN' without consuming VecN
-//                 #[inline]
-//                 pub fn normalized(&self) -> Self {
-//                     let mut vector = self.clone();
-//                     vector.normalize();
-//                     vector
-//                 }
-//
-//                 /// reverses the values of the vector
-//                 #[inline]
-//                 pub fn reverse(&mut self) {
-//                     self.data.reverse();
-//                 }
-//
-//                 /// returns a reversed VecN' without consuming VecN
-//                 #[inline]
-//                 pub fn reversed(&self) -> Self {
-//                     let mut vector = self.clone();
-//                     vector.reverse();
-//                     vector
-//                 }
-//
-//                 /// set each value within a VecN absolute
-//                 #[inline]
-//                 pub fn abs(&mut self) {
-//                     for i in 0..$d {
-//                         self.data[i] = self.data[i].abs();
-//                     }
-//                 }
-//
-//                 /// returns a VecN' with only absolute values without consuming VecN
-//                 #[inline]
-//                 pub fn absd(&self) -> Self {
-//                     let mut vector = self.clone();
-//                     vector.abs();
-//                     vector
-//                 }
-//
-//                 /// reflect VecN by a NormalN
-//                 #[inline]
-//                 pub fn reflect(&mut self, normal: Self) {
-//                     *self -= 2 as $t * self.dot(normal) * normal;
-//                 }
-//
-//                 /// return the reflected VecN' by a NormalN without consuming VecN
-//                 #[inline]
-//                 pub fn reflected(&self, normal: $n) -> Self {
-//                     let mut vector = *self;
-//                     vector.reflect(normal);
-//                     vector
-//                 }
-//
-//                 /// clamps the values of a VecN
-//                 #[inline]
-//                 pub fn clamp(&mut self, min: Self, max: Self) {
-//                     for i in 0..$d {
-//                         self.data[i] = self.data[i].max(min.data[i]).min(max.data[i])
-//                     }
-//                 }
-//
-//                 /// returns a VecN' with clamped values without consuming VecN
-//                 #[inline]
-//                 pub fn clamped(&self, min: Self, max: Self) -> Self {
-//                     let mut vector = *self;
-//                     vector.clamp(min, max);
-//                     vector
-//                 }
-//
-//                #[inline]
-//                 pub fn map<F: Fn($t) -> $t>(&self, f: F) -> Self {
-//                     let mut vector = *self;
-//                     for i in 0..$d {
-//                         vector.data[i] = f(vector.data[i]);
-//                     }
-//                     vector
-//                 }
-//
-//                 #[inline]
-//                 pub fn apply<F: Fn($t) -> $t>(&mut self, f: F) {
-//                     for i in 0..$d {
-//                         self.data[i] = f(self.data[i]);
-//                     }
-//                 }
-//
-//                 /// returns a new VecN' with each component having the bigger number from either VecN1 or VecN2
-//                 #[inline]
-//                 pub fn max_by_component(&self, other: &Self) -> Self {
-//                    let mut vector = *self;
-//                    for i in 0..$d {
-//                         vector.data[i] = self.data[i].max(other.data[i]);
-//                    }
-//                    vector
-//                 }
-//
-//                 /// returns a new VecN' with each component having the smaller number from either VecN1 or VecN2
-//                 #[inline]
-//                 pub fn min_by_component(&self, other: &Self) -> Self {
-//                    let mut vector = *self;
-//                    for i in 0..$d {
-//                         vector.data[i] = self.data[i].min(other.data[i]);
-//                    }
-//                    vector
-//                 }
-//
-//                 /// constructs a new VecN with all values being 0
-//                 #[inline]
-//                 pub fn zero() -> Self {
-//                     Self::broadcast(0 as $t)
-//                 }
-//
-//                 /// constructs a new VecN with all values being 1
-//                 #[inline]
-//                 pub fn one() -> Self {
-//                     Self::broadcast(1 as $t)
-//                 }
-//             }
-//
-//             impl Add for $n {
-//                 type Output = Self;
-//                 #[inline]
-//                 fn add(self, other: $n) -> Self {
-//                     let mut data = [<$t>::default(); $d];
-//                     for i in 0..$d {
-//                          data[i] = self.data[i] + other.data[i];
-//                     }
-//                     Self::new(data)
-//                 }
-//             }
-//
-//             impl AddAssign for $n {
-//                 #[inline]
-//                 fn add_assign(&mut self, other: $n) {
-//                     for i in 0..$d {
-//                         self.data[i] += other.data[i];
-//                     }
-//                 }
-//             }
-//
-//             impl Sub for $n {
-//                 type Output = Self;
-//                 #[inline]
-//                 fn sub(self, other: $n) -> Self {
-//                     let mut data = [<$t>::default(); $d];
-//                     for i in 0..$d {
-//                          data[i] = self.data[i] - other.data[i];
-//                     }
-//                     Self::new(data)
-//                 }
-//             }
-//
-//             impl SubAssign for $n {
-//                 #[inline]
-//                 fn sub_assign(&mut self, other: $n) {
-//                     for i in 0..$d {
-//                         self.data[i] -= other.data[i];
-//                     }
-//                 }
-//             }
-//
-//             /// Multiplication of Vector * Vector is a bit weird but it may come in as a nice to have.
-//             impl Mul for $n {
-//                 type Output = Self;
-//                 #[inline]
-//                 fn mul(self, other: $n) -> Self {
-//                     let mut data = [<$t>::default(); $d];
-//                     for i in 0..$d {
-//                          data[i] = self.data[i] * other.data[i];
-//                     }
-//                     Self::new(data)
-//                 }
-//             }
-//
-//             /// vec' := vec1 *= vec2
-//             impl MulAssign for $n {
-//                 #[inline]
-//                 fn mul_assign(&mut self, other: $n) {
-//                     for i in 0..$d {
-//                         self.data[i] *= other.data[i];
-//                     }
-//                 }
-//             }
-//
-//             /// vec' = vec * scalar
-//             impl Mul<$t> for $n {
-//                 type Output = Self;
-//                 #[inline]
-//                 fn mul(self, other: $t) -> Self {
-//                     let mut data = [<$t>::default(); $d];
-//                     for i in 0..$d {
-//                          data[i] = self.data[i] * other;
-//                     }
-//                     Self::new(data)
-//                 }
-//             }
-//
-//             /// vec' = scalar * vec
-//             impl Mul<$n> for $t {
-//                 type Output = $n;
-//                 #[inline]
-//                 fn mul(self, other: $n) -> $n {
-//                     let mut data = [<$t>::default(); $d];
-//                     for i in 0..$d {
-//                          data[i] = other.data[i] * self;
-//                     }
-//                     $n::new(data)
-//                 }
-//             }
-//
-//             /// vec' := vec * scalar
-//             impl MulAssign<$t> for $n {
-//                 #[inline]
-//                 fn mul_assign(&mut self, other: $t) {
-//                     for i in 0..$d {
-//                         self.data[i] *= other;
-//                     }
-//                 }
-//             }
-//
-//             /// Division of Vector / Vector is a bit weird but it may come in as a nice to have.
-//             impl Div for $n {
-//                 type Output = Self;
-//                 #[inline]
-//                 fn div(self, other: $n) -> Self {
-//                     let mut data = [<$t>::default(); $d];
-//                     for i in 0..$d {
-//                          data[i] = self.data[i] / other.data[i];
-//                     }
-//                     Self::new(data)
-//                 }
-//             }
-//
-//             /// vec' := vec1 /= vec2
-//             impl DivAssign for $n {
-//                 #[inline]
-//                 fn div_assign(&mut self, other: $n) {
-//                     for i in 0..$d {
-//                         self.data[i] /= other.data[i];
-//                     }
-//                 }
-//             }
-//
-//             /// vec' := vec /= scalar
-//             impl DivAssign<$t> for $n {
-//                 #[inline]
-//                 fn div_assign(&mut self, other: $t) {
-//                     for i in 0..$d {
-//                         self.data[i] /= other;
-//                     }
-//                 }
-//             }
-//
-//             /// -vec = -1 * vec
-//             impl Neg for $n {
-//                 type Output = $n;
-//                 #[inline]
-//                 fn neg(self) -> $n {
-//                     self * -1 as $t
-//                 }
-//             }
-//         )+
-//     }
-// }
-
 // A macro to add lettered getter and setter functions to a VecN
 //
 // # Usage

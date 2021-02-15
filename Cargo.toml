@@ -8,11 +8,11 @@ repository = "https://github.com/TriedWorks/gamma_ray"
 categories = ["mathematics", "science"]
 keywords = ["math", "mathematics", "science", "physics"]
 publish = true
-description = "multipurpose math and physics crate for my projects (development will start soon, currently this is mostly a name reserve, sorry :c)"
+description = "multipurpose math and physics crate for my projects"
 
 [lib]
 name = "gamma_ray"
 path = "src/lib.rs"
 
 [dependencies]
-paste = "1.0.0"
+paste = "1.0.4"

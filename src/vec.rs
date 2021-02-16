@@ -117,7 +117,7 @@ impl<T: MathComponent<T> + Copy, const N: usize> Vector<T, { N }> {
 
     #[inline]
     pub fn reflect(&mut self, normal: Self) {
-        *self -= normal * <T>::from_i32(2) * self.dot(normal);
+        *self -= normal * <T>::two() * self.dot(normal);
     }
 
     #[inline]

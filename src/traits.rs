@@ -4,26 +4,28 @@ use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 // so this should do for now
 // this does not implement `Copy` because maybe some other types are `Clone` only.
 pub trait MathComponent<T>:
-    Default
-    + Add<Output = T>
-    + AddAssign
-    + Sub<Output = T>
-    + SubAssign
-    + Mul<Output = T>
-    + MulAssign
-    + Div<Output = T>
-    + DivAssign
+Default
++ Add<Output=T>
++ AddAssign
++ Sub<Output=T>
++ SubAssign
++ Mul<Output=T>
++ MulAssign
++ Div<Output=T>
++ DivAssign
 {
     fn sqrt(&self) -> T;
     fn zero() -> T;
     fn one() -> T;
-    fn from_i32(num: i32) -> T;
+    fn two() -> T;
+    fn splat(val: T) -> T;
     fn abs(&self) -> T;
     fn minimum(&self, other: T) -> T;
     fn maximum(&self, other: T) -> T;
 }
 
-macro_rules! impl_vector_components {
+
+macro_rules! impl_math_components_float {
     ($($t:ty), *) => {
         $(
             impl MathComponent<$t> for $t {
@@ -39,8 +41,12 @@ macro_rules! impl_vector_components {
                     1.0
                 }
 
-                fn from_i32(num: i32) -> Self {
-                    num as $t
+                fn two() -> Self {
+                    2.0
+                }
+
+                fn splat(num: $t) -> Self {
+                    num
                 }
 
                 fn minimum(&self, other: $t) -> Self {
@@ -59,7 +65,7 @@ macro_rules! impl_vector_components {
     }
 }
 
-macro_rules! impl_vector_components_not_float {
+macro_rules! impl_math_components_integer {
     ($($t:ty), *) => {
         $(
             impl MathComponent<$t> for $t {
@@ -74,8 +80,12 @@ macro_rules! impl_vector_components_not_float {
                     1
                 }
 
-                fn from_i32(num: i32) -> Self {
-                    num as $t
+                fn two() -> Self {
+                    2
+                }
+
+                fn splat(val: $t) -> Self {
+                    val
                 }
 
                 fn minimum(&self, other: $t) -> Self {
@@ -87,19 +97,19 @@ macro_rules! impl_vector_components_not_float {
                 }
 
                 fn abs(&self) -> Self {
-                    self.abs()
+                    <$t>::abs(*self)
                 }
             }
         )*
     }
 }
 
-macro_rules! impl_vector_components_not_float_64 {
+macro_rules! impl_math_components_unsigned {
     ($($t:ty), *) => {
         $(
             impl MathComponent<$t> for $t {
                 fn sqrt(&self) -> Self {
-                    f64::sqrt(*self as f64) as $t
+                    f32::sqrt(*self as f32) as $t
                 }
                 fn zero() -> Self {
                     <$t>::default()
@@ -109,8 +119,12 @@ macro_rules! impl_vector_components_not_float_64 {
                     1
                 }
 
-                fn from_i32(num: i32) -> Self {
-                    num as $t
+                fn two() -> Self {
+                    2
+                }
+
+                fn splat(val: $t) -> Self {
+                    val
                 }
 
                 fn minimum(&self, other: $t) -> Self {
@@ -122,13 +136,81 @@ macro_rules! impl_vector_components_not_float_64 {
                 }
 
                 fn abs(&self) -> Self {
-                    self.abs()
+                    *self
                 }
             }
         )*
     }
 }
 
-impl_vector_components!(f32, f64);
-impl_vector_components_not_float!(i8, i16, i32, u8, u16, u32);
-impl_vector_components_not_float_64!(i64, u64);
+impl_math_components_float!(f32);
+impl_math_components_integer!(i8, i16, i32);
+impl_math_components_unsigned!(u8, u16, u32);
+
+impl MathComponent<i64> for i64 {
+    fn sqrt(&self) -> i64 {
+        f64::sqrt(*self as f64) as i64
+    }
+
+    fn zero() -> i64 {
+        0
+    }
+
+    fn one() -> i64 {
+        1
+    }
+
+    fn two() -> i64 {
+        2
+    }
+
+    fn splat(val: i64) -> i64 {
+        val
+    }
+
+    fn abs(&self) -> i64 {
+        i64::abs(*self)
+    }
+
+    fn minimum(&self, other: i64) -> i64 {
+        *self.min(&other)
+    }
+
+    fn maximum(&self, other: i64) -> i64 {
+        *self.max(&other)
+    }
+}
+
+impl MathComponent<f64> for f64 {
+    fn sqrt(&self) -> f64 {
+        f64::sqrt(*self)
+    }
+
+    fn zero() -> f64 {
+        0.0
+    }
+
+    fn one() -> f64 {
+        1.0
+    }
+
+    fn two() -> f64 {
+        2.0
+    }
+
+    fn splat(val: f64) -> f64 {
+        val
+    }
+
+    fn abs(&self) -> f64 {
+        f64::abs(*self)
+    }
+
+    fn minimum(&self, other: f64) -> f64 {
+        self.min(other)
+    }
+
+    fn maximum(&self, other: f64) -> f64 {
+        self.max(other)
+    }
+}

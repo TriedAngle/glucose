@@ -1,8 +1,8 @@
+use crate::mat::Matrix;
 use crate::traits::MathComponent;
 use paste::paste;
 use std::fmt::{Display, Formatter};
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
-use crate::mat::Matrix;
 
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]

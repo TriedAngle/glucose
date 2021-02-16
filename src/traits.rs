@@ -4,15 +4,15 @@ use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 // so this should do for now
 // this does not implement `Copy` because maybe some other types are `Clone` only.
 pub trait MathComponent<T>:
-Default
-+ Add<Output=T>
-+ AddAssign
-+ Sub<Output=T>
-+ SubAssign
-+ Mul<Output=T>
-+ MulAssign
-+ Div<Output=T>
-+ DivAssign
+    Default
+    + Add<Output = T>
+    + AddAssign
+    + Sub<Output = T>
+    + SubAssign
+    + Mul<Output = T>
+    + MulAssign
+    + Div<Output = T>
+    + DivAssign
 {
     fn sqrt(&self) -> T;
     fn zero() -> T;
@@ -23,7 +23,6 @@ Default
     fn minimum(&self, other: T) -> T;
     fn maximum(&self, other: T) -> T;
 }
-
 
 macro_rules! impl_math_components_float {
     ($($t:ty), *) => {

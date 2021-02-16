@@ -2,8 +2,8 @@
 
 use crate::traits::MathComponent;
 use crate::vec::Vector;
-use std::ops::{Add, Mul, Sub};
 use std::fmt::{Display, Formatter};
+use std::ops::{Add, Mul, Sub};
 
 pub type SquareMatrix<T, const N: usize> = Matrix<T, { N }, { N }>;
 
@@ -16,7 +16,7 @@ pub struct Matrix<T, const M: usize, const N: usize> {
 impl<T: Default + Copy, const M: usize, const N: usize> Default for Matrix<T, { M }, { N }> {
     fn default() -> Self {
         Self {
-            data: [[<T>::default(); M]; N]
+            data: [[<T>::default(); M]; N],
         }
     }
 }
@@ -27,7 +27,7 @@ impl<T: Display, const M: usize, const N: usize> Display for Matrix<T, { M }, { 
         for m in 0..M {
             &string.push_str("|");
             for n in 0..N {
-                if n == N-1 {
+                if n == N - 1 {
                     &string.push_str(&format!("{}", self.data[n][m]));
                     break;
                 }
@@ -51,7 +51,7 @@ impl<T, const M: usize, const N: usize> Matrix<T, { M }, { N }> {
 
 impl<T: Default + Copy, const M: usize, const N: usize> Matrix<T, { M }, { N }> {
     pub fn to_vectors(&self) -> [Vector<T, { M }>; N] {
-        let mut vec_arr = [Vector::default() ; N];
+        let mut vec_arr = [Vector::default(); N];
         for i in 0..N {
             vec_arr[i] = self.data[i].into()
         }
@@ -105,13 +105,14 @@ impl<T: MathComponent<T> + Copy, const M: usize, const N: usize> Sub for Matrix<
     }
 }
 
-impl<T, const M: usize, const N: usize, const P: usize> Mul<Matrix<T, { N }, { P }>> for Matrix<T, { M }, { N }>
-    where
-        T: MathComponent<T> + Copy,
+impl<T, const M: usize, const N: usize, const P: usize> Mul<Matrix<T, { N }, { P }>>
+    for Matrix<T, { M }, { N }>
+where
+    T: MathComponent<T> + Copy,
 {
     type Output = Matrix<T, { M }, { P }>;
 
-    fn mul<>(self, rhs: Matrix<T, { N }, { P }>) -> Self::Output {
+    fn mul(self, rhs: Matrix<T, { N }, { P }>) -> Self::Output {
         let mut data = [[<T>::default(); M]; P];
         for m in 0..M {
             for p in 0..P {

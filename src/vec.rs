@@ -1,7 +1,7 @@
 use crate::traits::MathComponent;
 use paste::paste;
-use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 use std::fmt::{Display, Formatter};
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]

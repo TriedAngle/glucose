@@ -49,6 +49,16 @@ impl<T, const M: usize, const N: usize> Matrix<T, { M }, { N }> {
     }
 }
 
+impl<T: Default + Copy, const M: usize, const N: usize> Matrix<T, { M }, { N }> {
+    pub fn to_vectors(&self) -> [Vector<T, { M }>; N] {
+        let mut vec_arr = [Vector::default() ; N];
+        for i in 0..N {
+            vec_arr[i] = self.data[i].into()
+        }
+        vec_arr
+    }
+}
+
 impl<T: MathComponent<T> + Copy, const M: usize, const N: usize> Matrix<T, { M }, { N }> {
     pub fn zero() -> Self {
         Self {

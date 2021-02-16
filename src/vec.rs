@@ -2,6 +2,7 @@ use crate::traits::MathComponent;
 use paste::paste;
 use std::fmt::{Display, Formatter};
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
+use crate::mat::Matrix;
 
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -327,6 +328,12 @@ impl<T: MathComponent<T> + Copy, const N: usize> DivAssign<T> for Vector<T, { N 
         for i in 0..N {
             self.data[i] /= rhs;
         }
+    }
+}
+
+impl<T: Copy, const N: usize> From<Matrix<T, { N }, 1>> for Vector<T, { N }> {
+    fn from(rhs: Matrix<T, { N }, 1>) -> Self {
+        Self { data: rhs.data[0] }
     }
 }
 

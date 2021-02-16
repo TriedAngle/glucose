@@ -10,7 +10,7 @@ pub type SquareMatrix<T, const N: usize> = Matrix<T, { N }, { N }>;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct Matrix<T, const M: usize, const N: usize> {
-    data: [[T; M]; N],
+    pub data: [[T; M]; N],
 }
 
 impl<T: Default + Copy, const M: usize, const N: usize> Default for Matrix<T, { M }, { N }> {
@@ -122,6 +122,13 @@ where
             }
         }
         Matrix { data }
+    }
+}
+
+impl<T, const M: usize> From<Vector<T, { M }>> for Matrix<T, { M }, 1> {
+    fn from(rhs: Vector<T, { M }>) -> Self {
+        let data = [rhs.data; 1];
+        Self { data }
     }
 }
 

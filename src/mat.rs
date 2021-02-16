@@ -14,6 +14,7 @@ pub struct Matrix<T, const M: usize, const N: usize> {
 }
 
 impl<T: Default + Copy, const M: usize, const N: usize> Default for Matrix<T, { M }, { N }> {
+    #[inline]
     fn default() -> Self {
         Self {
             data: [[<T>::default(); M]; N],
@@ -22,6 +23,7 @@ impl<T: Default + Copy, const M: usize, const N: usize> Default for Matrix<T, { 
 }
 
 impl<T: Display, const M: usize, const N: usize> Display for Matrix<T, { M }, { N }> {
+    #[inline]
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let mut string = String::new();
         for m in 0..M {
@@ -40,16 +42,18 @@ impl<T: Display, const M: usize, const N: usize> Display for Matrix<T, { M }, { 
 }
 
 impl<T, const M: usize, const N: usize> Matrix<T, { M }, { N }> {
+    #[inline]
     pub fn new(data: [[T; M]; N]) -> Self {
         Self { data }
     }
-
+    #[inline]
     pub fn len(&self) -> usize {
         M * N
     }
 }
 
 impl<T: Default + Copy, const M: usize, const N: usize> Matrix<T, { M }, { N }> {
+    #[inline]
     pub fn to_vectors(&self) -> [Vector<T, { M }>; N] {
         let mut vec_arr = [Vector::default(); N];
         for i in 0..N {
@@ -60,6 +64,7 @@ impl<T: Default + Copy, const M: usize, const N: usize> Matrix<T, { M }, { N }> 
 }
 
 impl<T: MathComponent<T> + Copy, const M: usize, const N: usize> Matrix<T, { M }, { N }> {
+    #[inline]
     pub fn zero() -> Self {
         Self {
             data: [[<T>::zero(); M]; N],
@@ -68,6 +73,7 @@ impl<T: MathComponent<T> + Copy, const M: usize, const N: usize> Matrix<T, { M }
 }
 
 impl<T: MathComponent<T> + Copy, const N: usize> SquareMatrix<T, { N }> {
+    #[inline]
     pub fn new_identity() -> Self {
         let mut data = [[<T>::zero(); N]; N];
         for i in 0..N {
@@ -79,7 +85,7 @@ impl<T: MathComponent<T> + Copy, const N: usize> SquareMatrix<T, { N }> {
 
 impl<T: MathComponent<T> + Copy, const M: usize, const N: usize> Add for Matrix<T, { M }, { N }> {
     type Output = Self;
-
+    #[inline]
     fn add(self, rhs: Self) -> Self::Output {
         let mut data = [[<T>::default(); M]; N];
         for i in 0..N {
@@ -93,7 +99,7 @@ impl<T: MathComponent<T> + Copy, const M: usize, const N: usize> Add for Matrix<
 
 impl<T: MathComponent<T> + Copy, const M: usize, const N: usize> Sub for Matrix<T, { M }, { N }> {
     type Output = Self;
-
+    #[inline]
     fn sub(self, rhs: Self) -> Self::Output {
         let mut data = [[<T>::default(); M]; N];
         for i in 0..N {
@@ -106,12 +112,12 @@ impl<T: MathComponent<T> + Copy, const M: usize, const N: usize> Sub for Matrix<
 }
 
 impl<T, const M: usize, const N: usize, const P: usize> Mul<Matrix<T, { N }, { P }>>
-    for Matrix<T, { M }, { N }>
-where
-    T: MathComponent<T> + Copy,
+for Matrix<T, { M }, { N }>
+    where
+        T: MathComponent<T> + Copy,
 {
     type Output = Matrix<T, { M }, { P }>;
-
+    #[inline]
     fn mul(self, rhs: Matrix<T, { N }, { P }>) -> Self::Output {
         let mut data = [[<T>::default(); M]; P];
         for m in 0..M {
@@ -126,6 +132,7 @@ where
 }
 
 impl<T, const M: usize> From<Vector<T, { M }>> for Matrix<T, { M }, 1> {
+    #[inline]
     fn from(rhs: Vector<T, { M }>) -> Self {
         let data = [rhs.data; 1];
         Self { data }
@@ -133,6 +140,7 @@ impl<T, const M: usize> From<Vector<T, { M }>> for Matrix<T, { M }, 1> {
 }
 
 impl<T, const M: usize, const N: usize> From<[[T; M]; N]> for Matrix<T, { M }, { N }> {
+    #[inline]
     fn from(rhs: [[T; M]; N]) -> Self {
         Self { data: rhs }
     }

@@ -14,13 +14,21 @@ pub trait MathComponent<T>:
     + Div<Output = T>
     + DivAssign
 {
+    #[inline]
     fn sqrt(&self) -> T;
+    #[inline]
     fn zero() -> T;
+    #[inline]
     fn one() -> T;
+    #[inline]
     fn two() -> T;
+    #[inline]
     fn splat(val: T) -> T;
+    #[inline]
     fn abs(&self) -> T;
+    #[inline]
     fn minimum(&self, other: T) -> T;
+    #[inline]
     fn maximum(&self, other: T) -> T;
 }
 

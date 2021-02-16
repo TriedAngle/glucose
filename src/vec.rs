@@ -11,6 +11,7 @@ pub struct Vector<T, const N: usize> {
 }
 
 impl<T: Default + Copy, const N: usize> Default for Vector<T, { N }> {
+    #[inline]
     fn default() -> Self {
         Self {
             data: [<T>::default(); N],
@@ -19,6 +20,7 @@ impl<T: Default + Copy, const N: usize> Default for Vector<T, { N }> {
 }
 
 impl<T: Display, const N: usize> Display for Vector<T, { N }> {
+    #[inline]
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let mut string = String::new();
         for n in 0..N {
@@ -48,6 +50,7 @@ impl<T: Copy, const N: usize> Vector<T, { N }> {
 }
 
 impl<T: MathComponent<T> + Copy, const N: usize> Vector<T, { N }> {
+    #[inline]
     pub fn unit(n: usize) -> Self {
         let mut data = [<T>::default(); N];
         data[n] = <T>::one();
@@ -182,6 +185,7 @@ impl<T: MathComponent<T> + Copy, const N: usize> Vector<T, { N }> {
 
 // this seems a bit slow, maybe find a better way?
 impl<T: Default + Copy, const N: usize> Vector<T, { N }> {
+    #[inline]
     pub fn from<const M: usize>(rhs: Vector<T, { M }>) -> Self {
         if N == M {
             // I have no idea how to cast Array of size M to size N
@@ -206,6 +210,7 @@ impl<T: Default + Copy, const N: usize> Vector<T, { N }> {
 }
 
 impl<T, const N: usize> From<[T; N]> for Vector<T, { N }> {
+    #[inline]
     fn from(arr: [T; N]) -> Self {
         Self { data: arr }
     }
@@ -213,7 +218,7 @@ impl<T, const N: usize> From<[T; N]> for Vector<T, { N }> {
 
 impl<T: MathComponent<T> + Copy, const N: usize> Add for Vector<T, { N }> {
     type Output = Self;
-
+    #[inline]
     fn add(self, rhs: Self) -> Self::Output {
         let mut data = [<T>::default(); N];
         for i in 0..N {
@@ -224,6 +229,7 @@ impl<T: MathComponent<T> + Copy, const N: usize> Add for Vector<T, { N }> {
 }
 
 impl<T: MathComponent<T> + Copy, const N: usize> AddAssign for Vector<T, { N }> {
+    #[inline]
     fn add_assign(&mut self, rhs: Self) {
         for i in 0..N {
             self.data[i] += rhs.data[i];
@@ -233,7 +239,7 @@ impl<T: MathComponent<T> + Copy, const N: usize> AddAssign for Vector<T, { N }> 
 
 impl<T: MathComponent<T> + Copy, const N: usize> Sub for Vector<T, { N }> {
     type Output = Self;
-
+    #[inline]
     fn sub(self, rhs: Self) -> Self::Output {
         let mut data = [<T>::default(); N];
         for i in 0..N {
@@ -244,6 +250,7 @@ impl<T: MathComponent<T> + Copy, const N: usize> Sub for Vector<T, { N }> {
 }
 
 impl<T: MathComponent<T> + Copy, const N: usize> SubAssign for Vector<T, { N }> {
+    #[inline]
     fn sub_assign(&mut self, rhs: Self) {
         for i in 0..N {
             self.data[i] -= rhs.data[i];
@@ -253,7 +260,7 @@ impl<T: MathComponent<T> + Copy, const N: usize> SubAssign for Vector<T, { N }> 
 
 impl<T: MathComponent<T> + Copy, const N: usize> Mul for Vector<T, { N }> {
     type Output = Self;
-
+    #[inline]
     fn mul(self, rhs: Self) -> Self::Output {
         let mut data = [<T>::default(); N];
         for i in 0..N {
@@ -264,6 +271,7 @@ impl<T: MathComponent<T> + Copy, const N: usize> Mul for Vector<T, { N }> {
 }
 
 impl<T: MathComponent<T> + Copy, const N: usize> MulAssign for Vector<T, { N }> {
+    #[inline]
     fn mul_assign(&mut self, rhs: Self) {
         for i in 0..N {
             self.data[i] *= rhs.data[i];
@@ -273,7 +281,7 @@ impl<T: MathComponent<T> + Copy, const N: usize> MulAssign for Vector<T, { N }> 
 
 impl<T: MathComponent<T> + Copy, const N: usize> Div for Vector<T, { N }> {
     type Output = Self;
-
+    #[inline]
     fn div(self, rhs: Self) -> Self::Output {
         let mut data = [<T>::default(); N];
         for i in 0..N {
@@ -284,6 +292,7 @@ impl<T: MathComponent<T> + Copy, const N: usize> Div for Vector<T, { N }> {
 }
 
 impl<T: MathComponent<T> + Copy, const N: usize> DivAssign for Vector<T, { N }> {
+    #[inline]
     fn div_assign(&mut self, rhs: Self) {
         for i in 0..N {
             self.data[i] /= rhs.data[i];
@@ -293,7 +302,7 @@ impl<T: MathComponent<T> + Copy, const N: usize> DivAssign for Vector<T, { N }> 
 
 impl<T: MathComponent<T> + Copy, const N: usize> Mul<T> for Vector<T, { N }> {
     type Output = Self;
-
+    #[inline]
     fn mul(self, rhs: T) -> Self::Output {
         let mut data = [<T>::default(); N];
         for i in 0..N {
@@ -304,6 +313,7 @@ impl<T: MathComponent<T> + Copy, const N: usize> Mul<T> for Vector<T, { N }> {
 }
 
 impl<T: MathComponent<T> + Copy, const N: usize> MulAssign<T> for Vector<T, { N }> {
+    #[inline]
     fn mul_assign(&mut self, rhs: T) {
         for i in 0..N {
             self.data[i] *= rhs;
@@ -313,7 +323,7 @@ impl<T: MathComponent<T> + Copy, const N: usize> MulAssign<T> for Vector<T, { N 
 
 impl<T: MathComponent<T> + Copy, const N: usize> Div<T> for Vector<T, { N }> {
     type Output = Self;
-
+    #[inline]
     fn div(self, rhs: T) -> Self::Output {
         let mut data = [<T>::default(); N];
         for i in 0..N {
@@ -324,6 +334,7 @@ impl<T: MathComponent<T> + Copy, const N: usize> Div<T> for Vector<T, { N }> {
 }
 
 impl<T: MathComponent<T> + Copy, const N: usize> DivAssign<T> for Vector<T, { N }> {
+    #[inline]
     fn div_assign(&mut self, rhs: T) {
         for i in 0..N {
             self.data[i] /= rhs;
@@ -332,6 +343,7 @@ impl<T: MathComponent<T> + Copy, const N: usize> DivAssign<T> for Vector<T, { N 
 }
 
 impl<T: Copy, const N: usize> From<Matrix<T, { N }, 1>> for Vector<T, { N }> {
+    #[inline]
     fn from(rhs: Matrix<T, { N }, 1>) -> Self {
         Self { data: rhs.data[0] }
     }
@@ -378,7 +390,8 @@ macro_rules! letters_for_vectors {
         $(
             impl<T: MathComponent<T> + Copy> Vector<T, $e> {
                 $(
-                    pub fn $d(&self) -> T {
+                    #[inline]
+                    pub const fn $d(&self) -> T {
                         self.data[$c]
                     }
 

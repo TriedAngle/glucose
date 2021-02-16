@@ -4,6 +4,8 @@ use paste::paste;
 use std::fmt::{Display, Formatter};
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 
+pub type Point<T, const N: usize> = Vector<T, { N }>;
+
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct Vector<T, const N: usize> {
@@ -183,10 +185,10 @@ impl<T: MathComponent<T> + Copy, const N: usize> Vector<T, { N }> {
     }
 }
 
-// this seems a bit slow, maybe find a better way?
+// update when M = N comes out
 impl<T: Default + Copy, const N: usize> Vector<T, { N }> {
     #[inline]
-    pub fn from<const M: usize>(rhs: Vector<T, { M }>) -> Self {
+    pub fn from_other<const M: usize>(rhs: Vector<T, { M }>) -> Self {
         if N == M {
             // I have no idea how to cast Array of size M to size N
             // this works for now I guess?

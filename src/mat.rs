@@ -131,6 +131,15 @@ for Matrix<T, { M }, { N }>
     }
 }
 
+impl<T: MathComponent<T> + Copy, const N: usize, const M: usize> Mul<Vector<T, { N }>> for Matrix<T, { M }, { N }> {
+    type Output = Vector<T, { M }>;
+
+    #[inline]
+    fn mul(self, rhs: Vector<T, { N }>) -> Self::Output {
+        Vector::from(self * Matrix::from(rhs))
+    }
+}
+
 impl<T, const M: usize> From<Vector<T, { M }>> for Matrix<T, { M }, 1> {
     #[inline]
     fn from(rhs: Vector<T, { M }>) -> Self {

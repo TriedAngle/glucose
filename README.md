@@ -5,7 +5,7 @@
 -----
 
 <p align="center">
-  <strong> multipurpose math and physics crate </strong> for the rust programming language and planned python bindings.
+  <strong> multipurpose math and physics crate </strong> for the rust programming language with planned python bindings.
   implemented with the help of rust's new const 
 </p>
 
@@ -15,7 +15,7 @@
   <strong> Note: </strong> 
   <ul>
       <li>
-          Rust 1.51 and onwards is required
+          Rust 1.51 (nightly only right now) and onwards is required
       </li>
       <li>
           this project is under heavy development and not really usable from a consumer-perspective 

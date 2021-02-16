@@ -3,12 +3,40 @@
 use crate::traits::MathComponent;
 use crate::vec::Vector;
 use std::ops::{Add, Mul, Sub};
+use std::fmt::{Display, Formatter};
 
 pub type SquareMatrix<T, const N: usize> = Matrix<T, { N }, { N }>;
 
+#[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct Matrix<T, const M: usize, const N: usize> {
     data: [[T; M]; N],
+}
+
+impl<T: Default + Copy, const M: usize, const N: usize> Default for Matrix<T, { M }, { N }> {
+    fn default() -> Self {
+        Self {
+            data: [[<T>::default(); M]; N]
+        }
+    }
+}
+
+impl<T: Display, const M: usize, const N: usize> Display for Matrix<T, { M }, { N }> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        let mut string = String::new();
+        for m in 0..M {
+            &string.push_str("|");
+            for n in 0..N {
+                if n == N-1 {
+                    &string.push_str(&format!("{}", self.data[n][m]));
+                    break;
+                }
+                &string.push_str(&format!("{} ", self.data[n][m]));
+            }
+            &string.push_str("|\n");
+        }
+        write!(f, "{}", string)
+    }
 }
 
 impl<T, const M: usize, const N: usize> Matrix<T, { M }, { N }> {
@@ -68,8 +96,8 @@ impl<T: MathComponent<T> + Copy, const M: usize, const N: usize> Sub for Matrix<
 }
 
 impl<T, const M: usize, const N: usize, const P: usize> Mul<Matrix<T, { N }, { P }>> for Matrix<T, { M }, { N }>
-where
-    T: MathComponent<T> + Copy,
+    where
+        T: MathComponent<T> + Copy,
 {
     type Output = Matrix<T, { M }, { P }>;
 
@@ -86,26 +114,8 @@ where
     }
 }
 
-impl<T: Copy, const M: usize, const N: usize> Matrix<T, { M }, { N }> {
-    pub fn to_vectors(&self) -> Vec<Vector<T, { M }>> {
-        self.data.iter().map(|col| Vector::new(*col)).collect()
-    }
-}
-
 impl<T, const M: usize, const N: usize> From<[[T; M]; N]> for Matrix<T, { M }, { N }> {
     fn from(rhs: [[T; M]; N]) -> Self {
         Self { data: rhs }
     }
-}
-
-#[test]
-fn test() {
-    let mat_arr1 = [[1.0, 2.0, 3.0],[2.0, 1.0, 3.0]];
-    let mat_arr2 = [[2.0, 1.0], [3.0, 1.0], [2.0, 3.0]];
-    let mat1: Matrix<f64, 3, 2> = Matrix::from(mat_arr1);
-    let mat2 : Matrix<f64, 2, 3>= Matrix::from(mat_arr2);
-    let mat3 =  mat1 * mat2;
-    println!("{:?}", mat1);
-    println!("{:?}", mat2);
-    println!("{:?}", mat3);
 }

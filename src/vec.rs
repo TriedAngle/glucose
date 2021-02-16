@@ -1,10 +1,12 @@
 use crate::traits::MathComponent;
 use paste::paste;
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
+use std::fmt::{Display, Formatter};
 
+#[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct Vector<T, const N: usize> {
-    data: [T; N],
+    pub data: [T; N],
 }
 
 impl<T: Default + Copy, const N: usize> Default for Vector<T, { N }> {
@@ -12,6 +14,16 @@ impl<T: Default + Copy, const N: usize> Default for Vector<T, { N }> {
         Self {
             data: [<T>::default(); N],
         }
+    }
+}
+
+impl<T: Display, const N: usize> Display for Vector<T, { N }> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        let mut string = String::new();
+        for n in 0..N {
+            &string.push_str(&format!("|{}|\n", self.data[n]));
+        }
+        write!(f, "{}", string)
     }
 }
 

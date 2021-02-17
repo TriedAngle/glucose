@@ -2,6 +2,7 @@
 
 use crate::traits::MathComponent;
 use crate::vec::Vector;
+use std::alloc::Layout;
 use std::fmt::{Display, Formatter};
 use std::ops::{Add, Mul, Sub};
 
@@ -43,12 +44,51 @@ impl<T: Display, const M: usize, const N: usize> Display for Matrix<T, { M }, { 
 
 impl<T, const M: usize, const N: usize> Matrix<T, { M }, { N }> {
     #[inline]
-    pub fn new(data: [[T; M]; N]) -> Self {
+
+    pub const fn new(data: [[T; M]; N]) -> Self {
         Self { data }
     }
+
     #[inline]
-    pub fn len(&self) -> usize {
+    pub const fn len(&self) -> usize {
         M * N
+    }
+
+    #[inline]
+    pub fn layout() -> Layout {
+        Layout::from_size_align(std::mem::size_of::<Self>(), std::mem::align_of::<[T; M]>())
+            .unwrap()
+    }
+
+    #[inline]
+    pub fn as_slice(&self) -> &[T] {
+        // this is safe because the underlying data structure of a matrix has length M * N
+        unsafe { std::slice::from_raw_parts(self as *const Self as *const T, M * N) }
+    }
+
+    #[inline]
+    pub fn as_mut_slice(&mut self) -> &mut [T] {
+        unsafe { std::slice::from_raw_parts_mut(self as *mut Self as *mut T, M * N) }
+    }
+
+    #[inline]
+    pub fn as_ptr(&self) -> *const T {
+        self as *const Self as *const T
+    }
+
+    #[inline]
+    pub fn as_mut_ptr(&mut self) -> *mut T {
+        self as *mut Self as *mut T
+    }
+
+    #[inline]
+    pub fn as_bytes(&self) -> &[u8] {
+        unsafe {
+            std::slice::from_raw_parts(
+                self as *const Self as *const u8,
+                M * N * std::mem::size_of::<Self>(),
+            )
+        }
     }
 }
 
@@ -72,7 +112,7 @@ impl<T: MathComponent<T> + Copy, const M: usize, const N: usize> Matrix<T, { M }
     }
 }
 
-impl<T: MathComponent<T> + Copy, const N: usize> SquareMatrix<T, { N }> {
+impl<T: MathComponent<T> + Copy, const N: usize> Matrix<T, { N }, { N }> {
     #[inline]
     pub fn new_identity() -> Self {
         let mut data = [[<T>::zero(); N]; N];
@@ -112,9 +152,9 @@ impl<T: MathComponent<T> + Copy, const M: usize, const N: usize> Sub for Matrix<
 }
 
 impl<T, const M: usize, const N: usize, const P: usize> Mul<Matrix<T, { N }, { P }>>
-for Matrix<T, { M }, { N }>
-    where
-        T: MathComponent<T> + Copy,
+    for Matrix<T, { M }, { N }>
+where
+    T: MathComponent<T> + Copy,
 {
     type Output = Matrix<T, { M }, { P }>;
     #[inline]
@@ -131,7 +171,9 @@ for Matrix<T, { M }, { N }>
     }
 }
 
-impl<T: MathComponent<T> + Copy, const N: usize, const M: usize> Mul<Vector<T, { N }>> for Matrix<T, { M }, { N }> {
+impl<T: MathComponent<T> + Copy, const N: usize, const M: usize> Mul<Vector<T, { N }>>
+    for Matrix<T, { M }, { N }>
+{
     type Output = Vector<T, { M }>;
 
     #[inline]
@@ -144,6 +186,7 @@ impl<T, const M: usize> From<Vector<T, { M }>> for Matrix<T, { M }, 1> {
     #[inline]
     fn from(rhs: Vector<T, { M }>) -> Self {
         let data = [rhs.data; 1];
+        let x = vec![5, 2];
         Self { data }
     }
 }

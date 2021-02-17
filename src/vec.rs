@@ -42,6 +42,46 @@ impl<T, const N: usize> Vector<T, { N }> {
     pub const fn len(&self) -> usize {
         N
     }
+
+    #[inline]
+    pub const fn as_array(&self) -> &[T; N] {
+        &self.data
+    }
+
+    #[inline]
+    pub fn as_array_mut(&mut self) -> &mut [T; N] {
+        &mut self.data
+    }
+
+    #[inline]
+    pub fn as_slice(&self) -> &[T] {
+        unsafe { std::slice::from_raw_parts(self as *const Self as *const T, N) }
+    }
+
+    #[inline]
+    pub fn as_slice_mut(&mut self) -> &mut [T] {
+        unsafe { std::slice::from_raw_parts_mut(self as *mut Self as *mut T, N) }
+    }
+
+    #[inline]
+    pub const fn as_ptr(&self) -> *const T {
+        self as *const Self as *const T
+    }
+
+    #[inline]
+    pub fn as_mut_ptr(&mut self) -> *mut T {
+        self as *mut Self as *mut T
+    }
+
+    #[inline]
+    pub fn as_bytes(&self) -> &[u8] {
+        unsafe {
+            std::slice::from_raw_parts(
+                self as *const Self as *const u8,
+                N * std::mem::size_of::<Self>()
+            )
+        }
+    }
 }
 
 impl<T: Copy, const N: usize> Vector<T, { N }> {

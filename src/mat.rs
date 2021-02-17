@@ -67,12 +67,12 @@ impl<T, const M: usize, const N: usize> Matrix<T, { M }, { N }> {
     }
 
     #[inline]
-    pub fn as_mut_slice(&mut self) -> &mut [T] {
+    pub fn as_slice_mut(&mut self) -> &mut [T] {
         unsafe { std::slice::from_raw_parts_mut(self as *mut Self as *mut T, M * N) }
     }
 
     #[inline]
-    pub fn as_ptr(&self) -> *const T {
+    pub const fn as_ptr(&self) -> *const T {
         self as *const Self as *const T
     }
 

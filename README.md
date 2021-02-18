@@ -6,7 +6,7 @@
 
 <p align="center">
   <strong> multipurpose math and physics crate </strong> for the rust programming language with planned python bindings.
-  implemented with the help of rust's new const 
+  implemented with the help of rust's new const generics
 </p>
 
 -----

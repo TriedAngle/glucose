@@ -420,10 +420,10 @@ macro_rules! vec_short {
 ///
 /// # Example
 /// ```
-/// letters_for_vectors! {
-///     2 => [0, x; 1, y],
-///     3 => [0, x; 1, y; 2, z]
-/// }
+// letters_for_vectors! {
+//     2 => [0, x; 1, y],
+//     3 => [0, x; 1, y; 2, z]
+// }
 /// ```
 // TODO: add recursive parsing so the inner expression can be omitted
 #[macro_export]

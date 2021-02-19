@@ -284,9 +284,11 @@ impl<T: MathComponent<T> + Copy, const N: usize> Sub for Vector<T, { N }> {
     #[inline]
     fn sub(self, rhs: Self) -> Self::Output {
         let mut data = [<T>::default(); N];
-        for i in 0..N {
-            data[i] = self.data[i] - rhs.data[i];
-        }
+
+        data.iter_mut()
+            .zip(self.data.iter()).zip(rhs.data.iter())
+            .for_each(|((e, x), y)| *e = *x - *y);
+
         Self { data }
     }
 }
@@ -294,9 +296,8 @@ impl<T: MathComponent<T> + Copy, const N: usize> Sub for Vector<T, { N }> {
 impl<T: MathComponent<T> + Copy, const N: usize> SubAssign for Vector<T, { N }> {
     #[inline]
     fn sub_assign(&mut self, rhs: Self) {
-        for i in 0..N {
-            self.data[i] -= rhs.data[i];
-        }
+        self.data.iter_mut().zip(rhs.data.iter())
+            .for_each(|(e, x)| *e -= *x);
     }
 }
 
@@ -454,5 +455,76 @@ macro_rules! letters_for_vectors {
                 )+
             }
         )+
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::vec::Vector;
+
+    #[test]
+    fn create_numeric_vectors() {
+        let vec_float = Vector::new([2.0, 3.0, 1.0]);
+        let vec_int = Vector::new([2, 3, 1]);
+        assert_eq!(vec_float.data, [2.0, 3.0, 1.0]);
+        assert_eq!(vec_int.data, [2, 3, 1]);
+    }
+
+    #[test]
+    fn create_non_numeric_vector() {
+        let vec = Vector::new(["string", "test"]);
+        assert_eq!(vec.data, ["string", "test"])
+    }
+
+    #[test]
+    fn create_probably_illegal_vector() {
+        // this compiles but this doesn't really have any implementations
+        // and it shouldn't have any!
+        let vec = Vector::new([["lol", "is"], ["why", "no"]]);
+    }
+
+    #[test]
+    fn vector_from_trait() {
+        let vec: Vector<f32, 2> = [2.0, 1.0].into();
+        assert_eq!(vec.data, [2.0, 1.0]);
+    }
+
+    #[test]
+    fn vector_from_vector() {
+        let vec_3 = Vector::new([3.0, 2.0, 1.0]);
+        let vec_1: Vector<f32, 1> = Vector::from_other(vec_3);
+        let vec_2: Vector<f32, 2> = Vector::from_other(vec_3);
+        let vec_4: Vector<f32, 4> = Vector::from_other(vec_3);
+        let vec_5: Vector<f32, 5> = Vector::from_other(vec_3);
+
+        assert_eq!(vec_1.data, [3.0]);
+        assert_eq!(vec_2.data, [3.0, 2.0]);
+        assert_eq!(vec_4.data, [3.0, 2.0, 1.0, 0.0]);
+        assert_eq!(vec_5.data, [3.0, 2.0, 1.0, 0.0, 0.0]);
+    }
+
+    #[test]
+    fn vector_add() {
+        let vec1 = Vector::new([3.0, 2.0, 1.0]);
+        let mut vec1_copy = vec1;
+        let vec2 = Vector::new([2.0, 4.2, 1.1]);
+        let vec3 = vec1 + vec2;
+        vec1_copy += vec2;
+
+        assert_eq!(vec3.data, [5.0, 6.2, 2.1]);
+        assert_eq!(vec1_copy.data, [5.0, 6.2, 2.1]);
+    }
+
+    #[test]
+    fn vector_sub() {
+        let vec1 = Vector::new([3.0, 2.0, 1.0]);
+        let mut vec1_copy = vec1;
+        let vec2 = Vector::new([2.0, 4.2, 1.0]);
+        let vec3 = vec1 - vec2;
+        vec1_copy -= vec2;
+
+        assert_eq!(vec3.data, [1.0, -2.2, 0.0]);
+        assert_eq!(vec1_copy.data, [1.0, -2.2, 0.0]);
     }
 }

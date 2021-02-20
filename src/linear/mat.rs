@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 
+use crate::linear::vec::Vector;
 use crate::traits::MathComponent;
-use crate::vec::Vector;
 use std::alloc::Layout;
 use std::fmt::{Display, Formatter};
 use std::ops::{Add, Mul, Sub};

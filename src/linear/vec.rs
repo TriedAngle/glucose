@@ -1,4 +1,4 @@
-use crate::mat::Matrix;
+use crate::linear::mat::Matrix;
 use crate::traits::MathComponent;
 use paste::paste;
 use std::fmt::{Display, Formatter};
@@ -78,7 +78,7 @@ impl<T, const N: usize> Vector<T, { N }> {
         unsafe {
             std::slice::from_raw_parts(
                 self as *const Self as *const u8,
-                N * std::mem::size_of::<Self>()
+                N * std::mem::size_of::<Self>(),
             )
         }
     }
@@ -286,7 +286,8 @@ impl<T: MathComponent<T> + Copy, const N: usize> Sub for Vector<T, { N }> {
         let mut data = [<T>::default(); N];
 
         data.iter_mut()
-            .zip(self.data.iter()).zip(rhs.data.iter())
+            .zip(self.data.iter())
+            .zip(rhs.data.iter())
             .for_each(|((e, x), y)| *e = *x - *y);
 
         Self { data }
@@ -296,7 +297,9 @@ impl<T: MathComponent<T> + Copy, const N: usize> Sub for Vector<T, { N }> {
 impl<T: MathComponent<T> + Copy, const N: usize> SubAssign for Vector<T, { N }> {
     #[inline]
     fn sub_assign(&mut self, rhs: Self) {
-        self.data.iter_mut().zip(rhs.data.iter())
+        self.data
+            .iter_mut()
+            .zip(rhs.data.iter())
             .for_each(|(e, x)| *e -= *x);
     }
 }
@@ -461,7 +464,6 @@ macro_rules! letters_for_vectors {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::vec::Vector;
 
     #[test]
     fn create_numeric_vectors() {

@@ -11,15 +11,12 @@
 
 -----
 
-<div align="center">
-  <strong> Note: </strong> 
-  <ul>
-      <li>
-          Rust 1.51 (nightly only right now) and onwards is required
-      </li>
-      <li>
-          this project is under heavy development and not really usable from a consumer-perspective 
-          right now. Expect many breaking updates as architecture and features are not decided yet.
-      </li>
-  </ul>
-</div>
+
+#### Notes: 
+* Rust 1.51 (nightly only right now) and onwards is required
+
+* Why didn't you use crate X instead of writing Y yourself?  
+  Because I decided not to ;)
+
+* this project is under heavy development and not really usable from a consumer-perspective 
+  right now. Expect many breaking updates as architecture and features are not decided yet.

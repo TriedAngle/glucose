@@ -1,6 +1,5 @@
 #![allow(unused)]
 
-pub mod bivec;
-pub mod mat;
+pub mod linear;
+pub mod numeric;
 pub mod traits;
-pub mod vec;

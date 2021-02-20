@@ -1,15 +1,8 @@
-use crate::numeric::num::Num;
-use std::ops::{Not, BitAnd, BitOr, BitXor, Shl, Shr};
 use crate::numeric::bit::BitNum;
+use crate::numeric::num::Num;
+use std::ops::{BitAnd, BitOr, BitXor, Not, Shl, Shr};
 
-pub trait Int:
-    Num
-    + BitNum
-    + PartialOrd
-    + Ord
-    + Eq
-    + Copy
-{
+pub trait Int: Num + BitNum + PartialOrd + Ord + Eq + Copy {
     fn count_zeros(self) -> u32;
     fn count_ones(self) -> u32;
     fn leading_zeros(self) -> u32;

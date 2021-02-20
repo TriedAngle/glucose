@@ -1,6 +1,9 @@
-use crate::numeric::num::Num;
-use std::ops::{BitAnd, Not, BitXor, BitOr, Shl, Shr, BitAndAssign, BitOrAssign, BitXorAssign, ShlAssign, ShrAssign};
 use crate::numeric::identity::{One, Zero};
+use crate::numeric::num::Num;
+use std::ops::{
+    BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Not, Shl, ShlAssign, Shr,
+    ShrAssign,
+};
 
 pub trait BitNum: PartialEq + Zero + One + BitOps {}
 

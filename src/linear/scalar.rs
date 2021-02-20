@@ -1,4 +1,4 @@
-use crate::numeric::num::{NumAssign};
+use crate::numeric::num::NumAssign;
 
 pub trait Scalar: NumAssign + Default + Copy {}
 

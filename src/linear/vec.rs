@@ -1,11 +1,11 @@
 use crate::linear::mat::Matrix;
+use crate::linear::scalar::{Scalar, Two};
+use crate::numeric::cmp::Cmp;
+use crate::numeric::float::Float;
+use crate::numeric::sign::Signed;
 use paste::paste;
 use std::fmt::{Display, Formatter};
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
-use crate::linear::scalar::{Scalar, Two};
-use crate::numeric::float::Float;
-use crate::numeric::sign::Signed;
-use crate::numeric::cmp::Cmp;
 
 pub type Point<T, const N: usize> = Vector<T, { N }>;
 
@@ -197,7 +197,6 @@ impl<T: Scalar + Two, const N: usize> Vector<T, { N }> {
     pub fn reflect(&mut self, normal: Self) {
         *self -= normal * <T>::two() * self.dot(normal);
     }
-
 }
 
 impl<T: Scalar + Cmp, const N: usize> Vector<T, { N }> {

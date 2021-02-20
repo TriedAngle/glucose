@@ -1,10 +1,10 @@
 #![allow(dead_code)]
 
+use crate::linear::scalar::Scalar;
 use crate::linear::vec::Vector;
 use std::alloc::Layout;
 use std::fmt::{Display, Formatter};
 use std::ops::{Add, Mul, Sub};
-use crate::linear::scalar::Scalar;
 
 pub type SquareMatrix<T, const N: usize> = Matrix<T, { N }, { N }>;
 
@@ -169,9 +169,7 @@ impl<T: Scalar, const M: usize, const N: usize, const P: usize> Mul<Matrix<T, { 
     }
 }
 
-impl<T: Scalar, const N: usize, const M: usize> Mul<Vector<T, { N }>>
-    for Matrix<T, { M }, { N }>
-{
+impl<T: Scalar, const N: usize, const M: usize> Mul<Vector<T, { N }>> for Matrix<T, { M }, { N }> {
     type Output = Vector<T, { M }>;
 
     #[inline]

@@ -5,7 +5,7 @@ use crate::numeric::float::Float;
 use crate::numeric::sign::Signed;
 use paste::paste;
 use std::fmt::{Display, Formatter};
-use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign, Index, IndexMut};
 
 pub type Point<T, const N: usize> = Vector<T, { N }>;
 
@@ -403,6 +403,20 @@ impl<T: Copy, const N: usize> From<Matrix<T, { N }, 1>> for Vector<T, { N }> {
     #[inline]
     fn from(rhs: Matrix<T, { N }, 1>) -> Self {
         Self { data: rhs.data[0] }
+    }
+}
+
+impl<T, const N: usize> Index<usize> for Vector<T, { N }> {
+    type Output = T;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.data[index]
+    }
+}
+
+impl<T, const N: usize> IndexMut<usize> for Vector<T, { N }> {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        &mut self.data[index]
     }
 }
 

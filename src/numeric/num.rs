@@ -42,4 +42,3 @@ impl<T> NumAssign for T where T: Num + NumAssignOps {}
 
 impl<T> NumRef for T where T: Num + for<'r> NumOps<&'r T> {}
 impl<T, Base> RefNum<Base> for T where T: NumOps<Base, Base> + for<'r> NumOps<&'r Base, Base> {}
-

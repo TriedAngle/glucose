@@ -24,6 +24,8 @@ pub trait NumAssign: Num + NumAssignOps {}
 pub trait NumRef: Num + for<'a> NumOps<&'a Self> {}
 pub trait RefNum<Base>: NumOps<Base, Base> + for<'a> NumOps<&'a Base, Base> {}
 
+impl<T> Num for T where T: PartialEq + Zero + One + NumOps {}
+
 impl<T, Rhs, Output> NumOps<Rhs, Output> for T where
     T: Add<Rhs, Output = Output>
         + Sub<Rhs, Output = Output>

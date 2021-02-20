@@ -84,6 +84,3 @@ macro_rules! impl_float {
 }
 
 impl_float!(f32 f64);
-
-#[test]
-fn test() {}

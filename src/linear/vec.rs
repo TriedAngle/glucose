@@ -1,8 +1,11 @@
 use crate::linear::mat::Matrix;
-use crate::traits::MathComponent;
 use paste::paste;
 use std::fmt::{Display, Formatter};
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
+use crate::linear::scalar::{Scalar, Two};
+use crate::numeric::float::Float;
+use crate::numeric::sign::Signed;
+use crate::numeric::cmp::Cmp;
 
 pub type Point<T, const N: usize> = Vector<T, { N }>;
 
@@ -91,7 +94,7 @@ impl<T: Copy, const N: usize> Vector<T, { N }> {
     }
 }
 
-impl<T: MathComponent<T> + Copy, const N: usize> Vector<T, { N }> {
+impl<T: Scalar, const N: usize> Vector<T, { N }> {
     #[inline]
     pub fn unit(n: usize) -> Self {
         let mut data = [<T>::default(); N];
@@ -108,6 +111,44 @@ impl<T: MathComponent<T> + Copy, const N: usize> Vector<T, { N }> {
         sum
     }
 
+    #[inline]
+    pub fn reverse(&mut self) {
+        self.data.reverse()
+    }
+
+    #[inline]
+    pub fn reversed(&self) -> Self {
+        let mut vec = *self;
+        vec.reverse();
+        vec
+    }
+
+    #[inline]
+    pub fn map<F: Fn(T) -> T>(&self, f: F) -> Self {
+        let mut vector = *self;
+        vector.data.iter_mut().for_each(|e| *e = f(*e));
+        vector
+    }
+
+    #[inline]
+    pub fn apply<F: Fn(T) -> T>(&mut self, f: F) {
+        self.data.iter_mut().for_each(|e| *e = f(*e));
+    }
+
+    /// constructs a new VecN with all values being 0
+    #[inline]
+    pub fn zero() -> Self {
+        Self::broadcast(<T>::zero())
+    }
+
+    /// constructs a new VecN with all values being 1
+    #[inline]
+    pub fn one() -> Self {
+        Self::broadcast(<T>::one())
+    }
+}
+
+impl<T: Scalar + Float, const N: usize> Vector<T, { N }> {
     #[inline]
     pub fn magnitude_squared(&self) -> T {
         let mut magnitude = <T>::default();
@@ -134,19 +175,9 @@ impl<T: MathComponent<T> + Copy, const N: usize> Vector<T, { N }> {
         vec.normalize();
         vec
     }
+}
 
-    #[inline]
-    pub fn reverse(&mut self) {
-        self.data.reverse()
-    }
-
-    #[inline]
-    pub fn reversed(&self) -> Self {
-        let mut vec = *self;
-        vec.reverse();
-        vec
-    }
-
+impl<T: Scalar + Signed, const N: usize> Vector<T, { N }> {
     #[inline]
     pub fn abs(&mut self) {
         self.data.iter_mut().for_each(|e| *e = e.abs());
@@ -159,12 +190,17 @@ impl<T: MathComponent<T> + Copy, const N: usize> Vector<T, { N }> {
         vec.abs();
         vec
     }
+}
 
+impl<T: Scalar + Two, const N: usize> Vector<T, { N }> {
     #[inline]
     pub fn reflect(&mut self, normal: Self) {
         *self -= normal * <T>::two() * self.dot(normal);
     }
 
+}
+
+impl<T: Scalar + Cmp, const N: usize> Vector<T, { N }> {
     #[inline]
     pub fn clamp(&mut self, min: Self, max: Self) {
         for i in 0..N {
@@ -178,18 +214,6 @@ impl<T: MathComponent<T> + Copy, const N: usize> Vector<T, { N }> {
         let mut vec = *self;
         vec.clamp(min, max);
         vec
-    }
-
-    #[inline]
-    pub fn map<F: Fn(T) -> T>(&self, f: F) -> Self {
-        let mut vector = *self;
-        vector.data.iter_mut().for_each(|e| *e = f(*e));
-        vector
-    }
-
-    #[inline]
-    pub fn apply<F: Fn(T) -> T>(&mut self, f: F) {
-        self.data.iter_mut().for_each(|e| *e = f(*e));
     }
 
     /// returns a new VecN' with each component having the bigger number from either VecN1 or VecN2
@@ -210,18 +234,6 @@ impl<T: MathComponent<T> + Copy, const N: usize> Vector<T, { N }> {
             vector.data[i] = self.data[i].minimum(other.data[i]);
         }
         vector
-    }
-
-    /// constructs a new VecN with all values being 0
-    #[inline]
-    pub fn zero() -> Self {
-        Self::broadcast(<T>::zero())
-    }
-
-    /// constructs a new VecN with all values being 1
-    #[inline]
-    pub fn one() -> Self {
-        Self::broadcast(<T>::one())
     }
 }
 
@@ -258,7 +270,7 @@ impl<T, const N: usize> From<[T; N]> for Vector<T, { N }> {
     }
 }
 
-impl<T: MathComponent<T> + Copy, const N: usize> Add for Vector<T, { N }> {
+impl<T: Scalar, const N: usize> Add for Vector<T, { N }> {
     type Output = Self;
     #[inline]
     fn add(self, rhs: Self) -> Self::Output {
@@ -270,7 +282,7 @@ impl<T: MathComponent<T> + Copy, const N: usize> Add for Vector<T, { N }> {
     }
 }
 
-impl<T: MathComponent<T> + Copy, const N: usize> AddAssign for Vector<T, { N }> {
+impl<T: Scalar, const N: usize> AddAssign for Vector<T, { N }> {
     #[inline]
     fn add_assign(&mut self, rhs: Self) {
         for i in 0..N {
@@ -279,7 +291,7 @@ impl<T: MathComponent<T> + Copy, const N: usize> AddAssign for Vector<T, { N }> 
     }
 }
 
-impl<T: MathComponent<T> + Copy, const N: usize> Sub for Vector<T, { N }> {
+impl<T: Scalar, const N: usize> Sub for Vector<T, { N }> {
     type Output = Self;
     #[inline]
     fn sub(self, rhs: Self) -> Self::Output {
@@ -294,7 +306,7 @@ impl<T: MathComponent<T> + Copy, const N: usize> Sub for Vector<T, { N }> {
     }
 }
 
-impl<T: MathComponent<T> + Copy, const N: usize> SubAssign for Vector<T, { N }> {
+impl<T: Scalar, const N: usize> SubAssign for Vector<T, { N }> {
     #[inline]
     fn sub_assign(&mut self, rhs: Self) {
         self.data
@@ -304,7 +316,7 @@ impl<T: MathComponent<T> + Copy, const N: usize> SubAssign for Vector<T, { N }> 
     }
 }
 
-impl<T: MathComponent<T> + Copy, const N: usize> Mul for Vector<T, { N }> {
+impl<T: Scalar, const N: usize> Mul for Vector<T, { N }> {
     type Output = Self;
     #[inline]
     fn mul(self, rhs: Self) -> Self::Output {
@@ -316,7 +328,7 @@ impl<T: MathComponent<T> + Copy, const N: usize> Mul for Vector<T, { N }> {
     }
 }
 
-impl<T: MathComponent<T> + Copy, const N: usize> MulAssign for Vector<T, { N }> {
+impl<T: Scalar, const N: usize> MulAssign for Vector<T, { N }> {
     #[inline]
     fn mul_assign(&mut self, rhs: Self) {
         for i in 0..N {
@@ -325,7 +337,7 @@ impl<T: MathComponent<T> + Copy, const N: usize> MulAssign for Vector<T, { N }> 
     }
 }
 
-impl<T: MathComponent<T> + Copy, const N: usize> Div for Vector<T, { N }> {
+impl<T: Scalar, const N: usize> Div for Vector<T, { N }> {
     type Output = Self;
     #[inline]
     fn div(self, rhs: Self) -> Self::Output {
@@ -337,7 +349,7 @@ impl<T: MathComponent<T> + Copy, const N: usize> Div for Vector<T, { N }> {
     }
 }
 
-impl<T: MathComponent<T> + Copy, const N: usize> DivAssign for Vector<T, { N }> {
+impl<T: Scalar, const N: usize> DivAssign for Vector<T, { N }> {
     #[inline]
     fn div_assign(&mut self, rhs: Self) {
         for i in 0..N {
@@ -346,7 +358,7 @@ impl<T: MathComponent<T> + Copy, const N: usize> DivAssign for Vector<T, { N }> 
     }
 }
 
-impl<T: MathComponent<T> + Copy, const N: usize> Mul<T> for Vector<T, { N }> {
+impl<T: Scalar, const N: usize> Mul<T> for Vector<T, { N }> {
     type Output = Self;
     #[inline]
     fn mul(self, rhs: T) -> Self::Output {
@@ -358,7 +370,7 @@ impl<T: MathComponent<T> + Copy, const N: usize> Mul<T> for Vector<T, { N }> {
     }
 }
 
-impl<T: MathComponent<T> + Copy, const N: usize> MulAssign<T> for Vector<T, { N }> {
+impl<T: Scalar, const N: usize> MulAssign<T> for Vector<T, { N }> {
     #[inline]
     fn mul_assign(&mut self, rhs: T) {
         for i in 0..N {
@@ -367,7 +379,7 @@ impl<T: MathComponent<T> + Copy, const N: usize> MulAssign<T> for Vector<T, { N 
     }
 }
 
-impl<T: MathComponent<T> + Copy, const N: usize> Div<T> for Vector<T, { N }> {
+impl<T: Scalar, const N: usize> Div<T> for Vector<T, { N }> {
     type Output = Self;
     #[inline]
     fn div(self, rhs: T) -> Self::Output {
@@ -379,7 +391,7 @@ impl<T: MathComponent<T> + Copy, const N: usize> Div<T> for Vector<T, { N }> {
     }
 }
 
-impl<T: MathComponent<T> + Copy, const N: usize> DivAssign<T> for Vector<T, { N }> {
+impl<T: Scalar, const N: usize> DivAssign<T> for Vector<T, { N }> {
     #[inline]
     fn div_assign(&mut self, rhs: T) {
         for i in 0..N {

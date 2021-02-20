@@ -1,10 +1,10 @@
 #![allow(dead_code)]
 
 use crate::linear::vec::Vector;
-use crate::traits::MathComponent;
 use std::alloc::Layout;
 use std::fmt::{Display, Formatter};
 use std::ops::{Add, Mul, Sub};
+use crate::linear::scalar::Scalar;
 
 pub type SquareMatrix<T, const N: usize> = Matrix<T, { N }, { N }>;
 
@@ -103,7 +103,7 @@ impl<T: Default + Copy, const M: usize, const N: usize> Matrix<T, { M }, { N }> 
     }
 }
 
-impl<T: MathComponent<T> + Copy, const M: usize, const N: usize> Matrix<T, { M }, { N }> {
+impl<T: Scalar, const M: usize, const N: usize> Matrix<T, { M }, { N }> {
     #[inline]
     pub fn zero() -> Self {
         Self {
@@ -112,7 +112,7 @@ impl<T: MathComponent<T> + Copy, const M: usize, const N: usize> Matrix<T, { M }
     }
 }
 
-impl<T: MathComponent<T> + Copy, const N: usize> Matrix<T, { N }, { N }> {
+impl<T: Scalar, const N: usize> Matrix<T, { N }, { N }> {
     #[inline]
     pub fn new_identity() -> Self {
         let mut data = [[<T>::zero(); N]; N];
@@ -123,7 +123,7 @@ impl<T: MathComponent<T> + Copy, const N: usize> Matrix<T, { N }, { N }> {
     }
 }
 
-impl<T: MathComponent<T> + Copy, const M: usize, const N: usize> Add for Matrix<T, { M }, { N }> {
+impl<T: Scalar, const M: usize, const N: usize> Add for Matrix<T, { M }, { N }> {
     type Output = Self;
     #[inline]
     fn add(self, rhs: Self) -> Self::Output {
@@ -137,7 +137,7 @@ impl<T: MathComponent<T> + Copy, const M: usize, const N: usize> Add for Matrix<
     }
 }
 
-impl<T: MathComponent<T> + Copy, const M: usize, const N: usize> Sub for Matrix<T, { M }, { N }> {
+impl<T: Scalar, const M: usize, const N: usize> Sub for Matrix<T, { M }, { N }> {
     type Output = Self;
     #[inline]
     fn sub(self, rhs: Self) -> Self::Output {
@@ -151,10 +151,8 @@ impl<T: MathComponent<T> + Copy, const M: usize, const N: usize> Sub for Matrix<
     }
 }
 
-impl<T, const M: usize, const N: usize, const P: usize> Mul<Matrix<T, { N }, { P }>>
+impl<T: Scalar, const M: usize, const N: usize, const P: usize> Mul<Matrix<T, { N }, { P }>>
     for Matrix<T, { M }, { N }>
-where
-    T: MathComponent<T> + Copy,
 {
     type Output = Matrix<T, { M }, { P }>;
     #[inline]
@@ -171,7 +169,7 @@ where
     }
 }
 
-impl<T: MathComponent<T> + Copy, const N: usize, const M: usize> Mul<Vector<T, { N }>>
+impl<T: Scalar, const N: usize, const M: usize> Mul<Vector<T, { N }>>
     for Matrix<T, { M }, { N }>
 {
     type Output = Vector<T, { M }>;

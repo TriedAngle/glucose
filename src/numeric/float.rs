@@ -1,7 +1,7 @@
 use crate::numeric::num::Num;
 use crate::numeric::sign::Signed;
-use std::num::FpCategory;
 use crate::numeric::trig::Trig;
+use std::num::FpCategory;
 
 pub trait Float: Num + Signed + Trig + PartialOrd + Copy {
     fn is_finite(self) -> bool;
@@ -34,7 +34,6 @@ pub trait Float: Num + Signed + Trig + PartialOrd + Copy {
     fn hypot(self, rhs: Self) -> Self;
     fn exp_m1(self) -> Self;
     fn ln_1p(self) -> Self;
-
 }
 
 macro_rules! impl_float {
@@ -87,5 +86,4 @@ macro_rules! impl_float {
 impl_float!(f32 f64);
 
 #[test]
-fn test() {
-}
+fn test() {}

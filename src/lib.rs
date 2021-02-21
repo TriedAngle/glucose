@@ -1,7 +1,16 @@
 #![allow(unused)]
 
-pub mod linear;
+mod linear;
 pub mod numeric;
+mod impls;
+
+pub use linear::vec::{Vector, Point};
+pub use linear::scalar::{Scalar, Two};
+pub use linear::bivec::Bivector2;
+pub use linear::mat::{Matrix, SquareMatrix};
+pub use linear::rotor::Rotor2;
+
+pub use numeric as num;
 
 // this allows syntax like:
 // impl<T, const N: usize> Vector<T, { N }> where Assert::<N > 3>: IsTrue { }

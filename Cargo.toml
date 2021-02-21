@@ -16,3 +16,4 @@ path = "src/lib.rs"
 
 [dependencies]
 paste = "1.0.4"
+bytemuck = { version = "1.5.1", optional = true }

@@ -10,3 +10,4 @@ pub mod num;
 pub mod pow;
 pub mod sign;
 pub mod trig;
+pub mod mul_add;

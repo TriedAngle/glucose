@@ -93,11 +93,7 @@ impl<T, const M: usize, const N: usize> Matrix<T, { M }, { N }> {
 impl<T: Default + Copy, const M: usize, const N: usize> Matrix<T, { M }, { N }> {
     #[inline]
     pub fn to_vectors(&self) -> [Vector<T, { M }>; N] {
-        let mut vec_arr = [Vector::default(); N];
-        for i in 0..N {
-            vec_arr[i] = self.data[i].into()
-        }
-        vec_arr
+        self.data
     }
 }
 

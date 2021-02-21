@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 use crate::linear::scalar::Scalar;
 use crate::linear::vec::Vector;
 use std::alloc::Layout;
@@ -11,14 +9,14 @@ pub type SquareMatrix<T, const N: usize> = Matrix<T, { N }, { N }>;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct Matrix<T, const M: usize, const N: usize> {
-    pub data: [[T; M]; N],
+    pub data: [Vector<T, { M }>; N],
 }
 
 impl<T: Default + Copy, const M: usize, const N: usize> Default for Matrix<T, { M }, { N }> {
     #[inline]
     fn default() -> Self {
         Self {
-            data: [[<T>::default(); M]; N],
+            data: [Vector::default(); N],
         }
     }
 }
@@ -45,7 +43,7 @@ impl<T: Display, const M: usize, const N: usize> Display for Matrix<T, { M }, { 
 impl<T, const M: usize, const N: usize> Matrix<T, { M }, { N }> {
     #[inline]
 
-    pub const fn new(data: [[T; M]; N]) -> Self {
+    pub const fn new(data: [Vector<T, { M }>; N]) -> Self {
         Self { data }
     }
 
@@ -107,7 +105,7 @@ impl<T: Scalar, const M: usize, const N: usize> Matrix<T, { M }, { N }> {
     #[inline]
     pub fn zero() -> Self {
         Self {
-            data: [[<T>::zero(); M]; N],
+            data: [Vector::zero(); N],
         }
     }
 }
@@ -115,11 +113,11 @@ impl<T: Scalar, const M: usize, const N: usize> Matrix<T, { M }, { N }> {
 impl<T: Scalar, const N: usize> Matrix<T, { N }, { N }> {
     #[inline]
     pub fn new_identity() -> Self {
-        let mut data = [[<T>::zero(); N]; N];
+        let mut mat = Matrix::default();
         for i in 0..N {
-            data[i][i] = <T>::one();
+            mat.data[i] = Vector::unit(N);
         }
-        Self { data }
+        mat
     }
 }
 
@@ -127,7 +125,7 @@ impl<T: Scalar, const M: usize, const N: usize> Add for Matrix<T, { M }, { N }> 
     type Output = Self;
     #[inline]
     fn add(self, rhs: Self) -> Self::Output {
-        let mut data = [[<T>::default(); M]; N];
+        let mut data = [Vector::default(); N];
         for i in 0..N {
             for j in 0..M {
                 data[i][j] = self.data[i][j] + rhs.data[i][j];
@@ -141,7 +139,7 @@ impl<T: Scalar, const M: usize, const N: usize> Sub for Matrix<T, { M }, { N }> 
     type Output = Self;
     #[inline]
     fn sub(self, rhs: Self) -> Self::Output {
-        let mut data = [[<T>::default(); M]; N];
+        let mut data = [Vector::default(); N];
         for i in 0..N {
             for j in 0..M {
                 data[i][j] = self.data[i][j] - rhs.data[i][j];
@@ -157,7 +155,7 @@ impl<T: Scalar, const M: usize, const N: usize, const P: usize> Mul<Matrix<T, { 
     type Output = Matrix<T, { M }, { P }>;
     #[inline]
     fn mul(self, rhs: Matrix<T, { N }, { P }>) -> Self::Output {
-        let mut data = [[<T>::default(); M]; P];
+        let mut data = [Vector::default(); P];
         for m in 0..M {
             for p in 0..P {
                 for n in 0..N {
@@ -181,15 +179,20 @@ impl<T: Scalar, const N: usize, const M: usize> Mul<Vector<T, { N }>> for Matrix
 impl<T, const M: usize> From<Vector<T, { M }>> for Matrix<T, { M }, 1> {
     #[inline]
     fn from(rhs: Vector<T, { M }>) -> Self {
-        let data = [rhs.data; 1];
-        let x = vec![5, 2];
+        let data = [rhs];
         Self { data }
     }
 }
 
-impl<T, const M: usize, const N: usize> From<[[T; M]; N]> for Matrix<T, { M }, { N }> {
+impl<T: Default + Copy, const M: usize, const N: usize> From<[[T; M]; N]>
+    for Matrix<T, { M }, { N }>
+{
     #[inline]
     fn from(rhs: [[T; M]; N]) -> Self {
-        Self { data: rhs }
+        let mut mat = Matrix::default();
+        for i in 0..N {
+            mat.data[i].data = rhs[i];
+        }
+        mat
     }
 }

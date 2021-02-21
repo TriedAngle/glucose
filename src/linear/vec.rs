@@ -5,7 +5,7 @@ use crate::numeric::float::Float;
 use crate::numeric::sign::Signed;
 use paste::paste;
 use std::fmt::{Display, Formatter};
-use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign, Index, IndexMut};
+use std::ops::{Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, Sub, SubAssign};
 
 pub type Point<T, const N: usize> = Vector<T, { N }>;
 
@@ -275,7 +275,7 @@ impl<T: Scalar, const N: usize> Add for Vector<T, { N }> {
     fn add(self, rhs: Self) -> Self::Output {
         let mut data = [<T>::default(); N];
         for i in 0..N {
-            data[i] = self.data[i] + rhs.data[i];
+            data[i] = self[i] + rhs[i];
         }
         Self { data }
     }
@@ -285,7 +285,7 @@ impl<T: Scalar, const N: usize> AddAssign for Vector<T, { N }> {
     #[inline]
     fn add_assign(&mut self, rhs: Self) {
         for i in 0..N {
-            self.data[i] += rhs.data[i];
+            self[i] += rhs[i];
         }
     }
 }
@@ -296,10 +296,9 @@ impl<T: Scalar, const N: usize> Sub for Vector<T, { N }> {
     fn sub(self, rhs: Self) -> Self::Output {
         let mut data = [<T>::default(); N];
 
-        data.iter_mut()
-            .zip(self.data.iter())
-            .zip(rhs.data.iter())
-            .for_each(|((e, x), y)| *e = *x - *y);
+        for i in 0..N {
+            data[i] = self[i] - rhs[i]
+        }
 
         Self { data }
     }
@@ -308,10 +307,9 @@ impl<T: Scalar, const N: usize> Sub for Vector<T, { N }> {
 impl<T: Scalar, const N: usize> SubAssign for Vector<T, { N }> {
     #[inline]
     fn sub_assign(&mut self, rhs: Self) {
-        self.data
-            .iter_mut()
-            .zip(rhs.data.iter())
-            .for_each(|(e, x)| *e -= *x);
+        for i in 0..N {
+            self[i] -= rhs[i]
+        }
     }
 }
 
@@ -321,7 +319,7 @@ impl<T: Scalar, const N: usize> Mul for Vector<T, { N }> {
     fn mul(self, rhs: Self) -> Self::Output {
         let mut data = [<T>::default(); N];
         for i in 0..N {
-            data[i] = self.data[i] * rhs.data[i];
+            data[i] = self[i] * rhs[i];
         }
         Self { data }
     }
@@ -331,7 +329,7 @@ impl<T: Scalar, const N: usize> MulAssign for Vector<T, { N }> {
     #[inline]
     fn mul_assign(&mut self, rhs: Self) {
         for i in 0..N {
-            self.data[i] *= rhs.data[i];
+            self[i] *= rhs[i];
         }
     }
 }
@@ -342,7 +340,7 @@ impl<T: Scalar, const N: usize> Div for Vector<T, { N }> {
     fn div(self, rhs: Self) -> Self::Output {
         let mut data = [<T>::default(); N];
         for i in 0..N {
-            data[i] = self.data[i] / rhs.data[i];
+            data[i] = self[i] / rhs[i];
         }
         Self { data }
     }
@@ -352,7 +350,7 @@ impl<T: Scalar, const N: usize> DivAssign for Vector<T, { N }> {
     #[inline]
     fn div_assign(&mut self, rhs: Self) {
         for i in 0..N {
-            self.data[i] /= rhs.data[i];
+            self[i] /= rhs[i];
         }
     }
 }
@@ -363,7 +361,7 @@ impl<T: Scalar, const N: usize> Mul<T> for Vector<T, { N }> {
     fn mul(self, rhs: T) -> Self::Output {
         let mut data = [<T>::default(); N];
         for i in 0..N {
-            data[i] = self.data[i] * rhs;
+            data[i] = self[i] * rhs;
         }
         Self { data }
     }
@@ -373,7 +371,7 @@ impl<T: Scalar, const N: usize> MulAssign<T> for Vector<T, { N }> {
     #[inline]
     fn mul_assign(&mut self, rhs: T) {
         for i in 0..N {
-            self.data[i] *= rhs;
+            self[i] *= rhs;
         }
     }
 }
@@ -382,11 +380,11 @@ impl<T: Scalar, const N: usize> Div<T> for Vector<T, { N }> {
     type Output = Self;
     #[inline]
     fn div(self, rhs: T) -> Self::Output {
-        let mut data = [<T>::default(); N];
+        let mut vec = Self::zero();
         for i in 0..N {
-            data[i] = self.data[i] / rhs;
+            vec[i] = self[i] / rhs;
         }
-        Self { data }
+        vec
     }
 }
 
@@ -394,7 +392,7 @@ impl<T: Scalar, const N: usize> DivAssign<T> for Vector<T, { N }> {
     #[inline]
     fn div_assign(&mut self, rhs: T) {
         for i in 0..N {
-            self.data[i] /= rhs;
+            self[i] /= rhs;
         }
     }
 }
@@ -402,7 +400,7 @@ impl<T: Scalar, const N: usize> DivAssign<T> for Vector<T, { N }> {
 impl<T: Copy, const N: usize> From<Matrix<T, { N }, 1>> for Vector<T, { N }> {
     #[inline]
     fn from(rhs: Matrix<T, { N }, 1>) -> Self {
-        Self { data: rhs.data[0] }
+        rhs.data[0]
     }
 }
 
@@ -459,7 +457,7 @@ macro_rules! vec_short {
 macro_rules! letters_for_vectors {
     ($($e:expr => [$($c:expr, $d:ident);+]),+) => {
         $(
-            impl<T: MathComponent<T> + Copy> Vector<T, $e> {
+            impl<T: Scalar> Vector<T, $e> {
                 $(
                     #[inline]
                     pub const fn $d(&self) -> T {
@@ -489,6 +487,7 @@ macro_rules! letters_for_vectors {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::time::Instant;
 
     #[test]
     fn create_numeric_vectors() {

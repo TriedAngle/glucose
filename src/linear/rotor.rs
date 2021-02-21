@@ -1,12 +1,12 @@
 use crate::linear::bivec::Bivector2;
+use crate::linear::from_float;
+use crate::linear::mat::Matrix;
 use crate::linear::scalar::{Scalar, Two};
-use crate::numeric::identity::Zero;
 use crate::linear::vec::Vector;
 use crate::numeric::float::Float;
-use crate::linear::mat::Matrix;
-use crate::numeric::trig::Trig;
+use crate::numeric::identity::Zero;
 use crate::numeric::mul_add::MulAdd;
-use crate::linear::from_float;
+use crate::numeric::trig::Trig;
 
 #[derive(Debug, Copy, Clone)]
 pub struct Rotor2<S> {
@@ -17,15 +17,13 @@ pub struct Rotor2<S> {
 impl<S> Rotor2<S> {
     #[inline]
     pub const fn new(scalar: S, bivector: Bivector2<S>) -> Self {
-        Self {
-            scalar,
-            bivector
-        }
+        Self { scalar, bivector }
     }
 
     #[inline]
     pub fn layout() -> std::alloc::Layout {
-        std::alloc::Layout::from_size_align(std::mem::size_of::<Self>(), std::mem::align_of::<S>()).unwrap()
+        std::alloc::Layout::from_size_align(std::mem::size_of::<Self>(), std::mem::align_of::<S>())
+            .unwrap()
     }
 }
 
@@ -61,10 +59,12 @@ impl<S: Scalar + MulAdd<Output = S>> Rotor2<S> {
     pub fn rotate_by(&mut self, other: Self) {
         let b = *self;
         let a = other;
-        let sa2_plus_baxy2 = a.scalar.mul_add(a.scalar, a.bivector.data * a.bivector.data);
+        let sa2_plus_baxy2 = a
+            .scalar
+            .mul_add(a.scalar, a.bivector.data * a.bivector.data);
 
-        self.scalar = (a.scalar - b.scalar) * a.bivector.data * b.bivector.data
-            + b.scalar * sa2_plus_baxy2;
+        self.scalar =
+            (a.scalar - b.scalar) * a.bivector.data * b.bivector.data + b.scalar * sa2_plus_baxy2;
         self.bivector.data = b.bivector.data * sa2_plus_baxy2;
     }
 
@@ -90,21 +90,17 @@ impl<S: Scalar + Two> Rotor2<S> {
         let s2_minus_bxy2 = self.scalar * self.scalar - self.bivector.data * self.bivector.data;
         let two_s_bxy = S::two() * self.scalar * self.bivector.data;
 
-        Matrix::new(
-            [
-                Vector::new([s2_minus_bxy2, -two_s_bxy]),
-                Vector::new([two_s_bxy, s2_minus_bxy2]
-                )])
+        Matrix::new([
+            Vector::new([s2_minus_bxy2, -two_s_bxy]),
+            Vector::new([two_s_bxy, s2_minus_bxy2]),
+        ])
     }
-
 }
 
 impl<S: Scalar + Float> Rotor2<S> {
     #[inline]
     pub fn from_rotation_between(from: Vector<S, 2>, rhs: Vector<S, 2>) -> Self {
-        Self::new(
-            <S>::one() + rhs.dot(from),
-            rhs.wedge(from)).normalized()
+        Self::new(<S>::one() + rhs.dot(from), rhs.wedge(from)).normalized()
     }
 
     #[inline]
@@ -131,7 +127,7 @@ impl<S: Scalar + Float> Rotor2<S> {
     }
 }
 
-impl<S: Scalar + Two + Trig > Rotor2<S> {
+impl<S: Scalar + Two + Trig> Rotor2<S> {
     #[inline]
     pub fn from_angle(angle: S) -> Self {
         let half_angle = angle / <S>::two();
@@ -139,4 +135,3 @@ impl<S: Scalar + Two + Trig > Rotor2<S> {
         Self::new(cos, Bivector2::new(-sin))
     }
 }
-

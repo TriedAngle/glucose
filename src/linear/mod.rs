@@ -5,11 +5,11 @@ use crate::linear::scalar::Scalar;
 use crate::numeric::float::Float;
 
 pub mod bivec;
-pub mod specific_impls;
 pub mod mat;
-pub mod scalar;
-pub mod vec;
 pub mod rotor;
+pub mod scalar;
+pub mod specific_impls;
+pub mod vec;
 
 pub fn from_float<T: Scalar + From<U>, U: Scalar + Float>(val: U) -> T {
     From::from(val)

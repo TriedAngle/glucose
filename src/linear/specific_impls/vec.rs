@@ -1,6 +1,6 @@
+use crate::linear::bivec::Bivector2;
 use crate::linear::scalar::Scalar;
 use crate::linear::vec::Vector;
-use crate::linear::bivec::Bivector2;
 
 impl<T: Scalar> Vector<T, 2> {
     #[inline]
@@ -38,7 +38,9 @@ impl<T: Scalar> Vector<T, 2> {
 
     #[inline]
     pub fn wedge(&self, other: Self) -> Bivector2<T> {
-        Bivector2 { data: (self[0] * other[1]) - (other[0] * self[1]) }
+        Bivector2 {
+            data: (self[0] * other[1]) - (other[0] * self[1]),
+        }
     }
 }
 

@@ -1,8 +1,9 @@
 use crate::numeric::num::NumAssign;
+use std::ops::Neg;
 
-pub trait Scalar: NumAssign + Default + Copy {}
+pub trait Scalar: NumAssign + Default + Copy + Neg<Output = Self> {}
 
-impl<T: NumAssign + Default + Copy> Scalar for T {}
+impl<T: NumAssign + Default + Copy + Neg<Output = Self>> Scalar for T {}
 
 // I don't like having this trait but this is the easiest fix I can think of right now.
 // this trait will be removed or replaced probably sooner or later

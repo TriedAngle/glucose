@@ -55,6 +55,12 @@ impl<T> Bivector2<T> {
     }
 }
 
+impl<T: Scalar> Bivector2<T> {
+    pub fn dot(self, rhs: Self) -> T {
+        self.data * rhs.data
+    }
+}
+
 impl<T: Scalar + Float> Bivector2<T> {
     pub fn magnitude_squared(&self) -> T {
         self.data * self.data
@@ -73,10 +79,6 @@ impl<T: Scalar + Float> Bivector2<T> {
         let mut bivec = *self;
         bivec.normalize();
         bivec
-    }
-
-    pub fn dot(self, rhs: Self) -> T {
-        self.data * rhs.data
     }
 }
 

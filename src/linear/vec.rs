@@ -6,6 +6,7 @@ use crate::numeric::sign::Signed;
 use paste::paste;
 use std::fmt::{Display, Formatter};
 use std::ops::{Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, Sub, SubAssign};
+use std::iter::Sum;
 
 pub type Point<T, const N: usize> = Vector<T, { N }>;
 
@@ -148,14 +149,10 @@ impl<T: Scalar, const N: usize> Vector<T, { N }> {
     }
 }
 
-impl<T: Scalar + Float, const N: usize> Vector<T, { N }> {
+impl<T: Scalar + Float + Sum, const N: usize> Vector<T, { N }> {
     #[inline]
     pub fn magnitude_squared(&self) -> T {
-        let mut magnitude = <T>::default();
-        for i in 0..N {
-            magnitude += self.data[i] * self.data[i];
-        }
-        magnitude
+        self.data.iter().map(|e| *e * *e).sum()
     }
 
     #[inline]

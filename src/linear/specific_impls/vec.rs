@@ -3,30 +3,35 @@ use crate::linear::vec::Vector;
 use crate::linear::bivec::Bivector2;
 
 impl<T: Scalar> Vector<T, 2> {
+    #[inline]
     pub fn add_fast(&self, rhs: Self) -> Self {
         Self {
             data: [self[0] + rhs[0], self[1] + rhs[1]],
         }
     }
 
+    #[inline]
     pub fn sub_fast(&self, rhs: Self) -> Self {
         Self {
             data: [self[0] - rhs[0], self[1] - rhs[1]],
         }
     }
 
+    #[inline]
     pub fn mul_fast(&self, rhs: T) -> Self {
         Self {
             data: [self[0] * rhs, self[1] * rhs],
         }
     }
 
+    #[inline]
     pub fn div_fast(&self, rhs: T) -> Self {
         Self {
             data: [self[0] / rhs, self[1] / rhs],
         }
     }
 
+    #[inline]
     pub fn dot_fast(&self, rhs: Self) -> T {
         (self[0] * rhs[0]) + (self[1] * rhs[0])
     }
@@ -38,18 +43,21 @@ impl<T: Scalar> Vector<T, 2> {
 }
 
 impl<T: Scalar> Vector<T, 3> {
+    #[inline]
     pub fn add_fast(&self, rhs: Self) -> Self {
         Self {
             data: [self[0] + rhs[0], self[1] + rhs[1], self[2] + rhs[2]],
         }
     }
 
+    #[inline]
     pub fn sub_fast(&self, rhs: Self) -> Self {
         Self {
             data: [self[0] - rhs[0], self[1] - rhs[1], self[2] - rhs[2]],
         }
     }
 
+    #[inline]
     pub fn mul_fast(&self, rhs: T) -> Self {
         Self {
             data: [self[0] * rhs, self[1] * rhs, self[2] * rhs],
@@ -70,6 +78,7 @@ impl<T: Scalar> Vector<T, 3> {
 }
 
 impl<T: Scalar> Vector<T, 4> {
+    #[inline]
     pub fn add_fast(&self, rhs: Self) -> Self {
         Self {
             data: [
@@ -81,6 +90,7 @@ impl<T: Scalar> Vector<T, 4> {
         }
     }
 
+    #[inline]
     pub fn sub_fast(&self, rhs: Self) -> Self {
         Self {
             data: [
@@ -92,12 +102,14 @@ impl<T: Scalar> Vector<T, 4> {
         }
     }
 
+    #[inline]
     pub fn mul_fast(&self, rhs: T) -> Self {
         Self {
             data: [self[0] * rhs, self[1] * rhs, self[2] * rhs, self[3] * rhs],
         }
     }
 
+    #[inline]
     pub fn div_fast(&self, rhs: T) -> Self {
         Self {
             data: [self[0] / rhs, self[1] / rhs, self[2] / rhs, self[3] / rhs],
@@ -106,6 +118,7 @@ impl<T: Scalar> Vector<T, 4> {
 }
 
 impl<T: Scalar> Vector<T, 5> {
+    #[inline]
     pub fn add_fast(&self, rhs: Self) -> Self {
         Self {
             data: [
@@ -118,6 +131,7 @@ impl<T: Scalar> Vector<T, 5> {
         }
     }
 
+    #[inline]
     pub fn sub_fast(&self, rhs: Self) -> Self {
         Self {
             data: [
@@ -130,6 +144,7 @@ impl<T: Scalar> Vector<T, 5> {
         }
     }
 
+    #[inline]
     pub fn mul_fast(&self, rhs: T) -> Self {
         Self {
             data: [
@@ -142,6 +157,7 @@ impl<T: Scalar> Vector<T, 5> {
         }
     }
 
+    #[inline]
     pub fn div_fast(&self, rhs: T) -> Self {
         Self {
             data: [
@@ -156,6 +172,7 @@ impl<T: Scalar> Vector<T, 5> {
 }
 
 impl<T: Scalar> Vector<T, 6> {
+    #[inline]
     pub fn add_fast(&self, rhs: Self) -> Self {
         Self {
             data: [
@@ -169,6 +186,7 @@ impl<T: Scalar> Vector<T, 6> {
         }
     }
 
+    #[inline]
     pub fn sub_fast(&self, rhs: Self) -> Self {
         Self {
             data: [
@@ -182,6 +200,7 @@ impl<T: Scalar> Vector<T, 6> {
         }
     }
 
+    #[inline]
     pub fn mul_fast(&self, rhs: T) -> Self {
         Self {
             data: [
@@ -195,6 +214,7 @@ impl<T: Scalar> Vector<T, 6> {
         }
     }
 
+    #[inline]
     pub fn div_fast(&self, rhs: T) -> Self {
         Self {
             data: [
@@ -210,6 +230,7 @@ impl<T: Scalar> Vector<T, 6> {
 }
 
 impl<T: Scalar> Vector<T, 7> {
+    #[inline]
     pub fn add_fast(&self, rhs: Self) -> Self {
         Self {
             data: [
@@ -224,6 +245,7 @@ impl<T: Scalar> Vector<T, 7> {
         }
     }
 
+    #[inline]
     pub fn sub_fast(&self, rhs: Self) -> Self {
         Self {
             data: [
@@ -238,6 +260,7 @@ impl<T: Scalar> Vector<T, 7> {
         }
     }
 
+    #[inline]
     pub fn mul_fast(&self, rhs: T) -> Self {
         Self {
             data: [
@@ -252,6 +275,7 @@ impl<T: Scalar> Vector<T, 7> {
         }
     }
 
+    #[inline]
     pub fn div_fast(&self, rhs: T) -> Self {
         Self {
             data: [
@@ -268,6 +292,7 @@ impl<T: Scalar> Vector<T, 7> {
 }
 
 impl<T: Scalar> Vector<T, 8> {
+    #[inline]
     pub fn add_fast(&self, rhs: Self) -> Self {
         Self {
             data: [
@@ -283,6 +308,7 @@ impl<T: Scalar> Vector<T, 8> {
         }
     }
 
+    #[inline]
     pub fn sub_fast(&self, rhs: Self) -> Self {
         Self {
             data: [
@@ -298,6 +324,7 @@ impl<T: Scalar> Vector<T, 8> {
         }
     }
 
+    #[inline]
     pub fn mul_fast(&self, rhs: T) -> Self {
         Self {
             data: [
@@ -313,6 +340,7 @@ impl<T: Scalar> Vector<T, 8> {
         }
     }
 
+    #[inline]
     pub fn div_fast(&self, rhs: T) -> Self {
         Self {
             data: [

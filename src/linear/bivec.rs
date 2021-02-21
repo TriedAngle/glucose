@@ -6,12 +6,12 @@ use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssi
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct Bivector2<T> {
-    pub xy: T,
+    pub data: T,
 }
 
 impl<T> Bivector2<T> {
-    pub const fn new(xy: T) -> Self {
-        Self { xy }
+    pub const fn new(data: T) -> Self {
+        Self { data }
     }
 
     #[inline]
@@ -57,7 +57,7 @@ impl<T> Bivector2<T> {
 
 impl<T: Scalar + Float> Bivector2<T> {
     pub fn magnitude_squared(&self) -> T {
-        self.xy * self.xy
+        self.data * self.data
     }
 
     pub fn magnitude(&self) -> T {
@@ -66,7 +66,7 @@ impl<T: Scalar + Float> Bivector2<T> {
 
     pub fn normalize(&mut self) {
         let mag = self.magnitude();
-        self.xy /= mag;
+        self.data /= mag;
     }
 
     pub fn normalized(&self) -> Self {
@@ -76,7 +76,7 @@ impl<T: Scalar + Float> Bivector2<T> {
     }
 
     pub fn dot(self, rhs: Self) -> T {
-        self.xy * rhs.xy
+        self.data * rhs.data
     }
 }
 
@@ -92,7 +92,7 @@ impl<T: Scalar> Add for Bivector2<T> {
 impl<T: Scalar> AddAssign for Bivector2<T> {
     #[inline]
     fn add_assign(&mut self, rhs: Bivector2<T>) {
-        self.xy += rhs.xy;
+        self.data += rhs.data;
     }
 }
 
@@ -108,7 +108,7 @@ impl<T: Scalar> Sub for Bivector2<T> {
 impl<T: Scalar> SubAssign for Bivector2<T> {
     #[inline]
     fn sub_assign(&mut self, rhs: Bivector2<T>) {
-        self.xy -= rhs.xy;
+        self.data -= rhs.data;
     }
 }
 
@@ -133,14 +133,14 @@ impl<T: Scalar> Mul<T> for Bivector2<T> {
 impl<T: Scalar> MulAssign for Bivector2<T> {
     #[inline]
     fn mul_assign(&mut self, rhs: Self) {
-        self.xy *= rhs.xy;
+        self.data *= rhs.data;
     }
 }
 
 impl<T: Scalar> MulAssign<T> for Bivector2<T> {
     #[inline]
     fn mul_assign(&mut self, rhs: T) {
-        self.xy *= rhs;
+        self.data *= rhs;
     }
 }
 
@@ -157,7 +157,7 @@ impl<T: Scalar> Div<T> for Bivector2<T> {
     type Output = Bivector2<T>;
     #[inline]
     fn div(mut self, rhs: T) -> Bivector2<T> {
-        self.xy /= rhs;
+        self.data /= rhs;
         self
     }
 }
@@ -165,14 +165,14 @@ impl<T: Scalar> Div<T> for Bivector2<T> {
 impl<T: Scalar> DivAssign for Bivector2<T> {
     #[inline]
     fn div_assign(&mut self, rhs: Self) {
-        self.xy /= rhs.xy;
+        self.data /= rhs.data;
     }
 }
 
 impl<T: Scalar> DivAssign<T> for Bivector2<T> {
     #[inline]
     fn div_assign(&mut self, rhs: T) {
-        self.xy /= rhs;
+        self.data /= rhs;
     }
 }
 
@@ -180,27 +180,27 @@ impl<T: Scalar> Neg for Bivector2<T> {
     type Output = Self;
     #[inline]
     fn neg(mut self) -> Self {
-        self.xy = -self.xy;
+        self.data = -self.data;
         self
     }
 }
 
 impl<T: Scalar> Zero for Bivector2<T> {
     fn zero() -> Self {
-        Self { xy: <T>::zero() }
+        Self { data: <T>::zero() }
     }
 
     fn is_zero(&self) -> bool {
-        self.xy == <T>::zero()
+        self.data == <T>::zero()
     }
 }
 
 impl<T: Scalar> One for Bivector2<T> {
     fn one() -> Self {
-        Self { xy: <T>::one() }
+        Self { data: <T>::one() }
     }
 
     fn is_one(&self) -> bool {
-        self.xy == <T>::one()
+        self.data == <T>::one()
     }
 }

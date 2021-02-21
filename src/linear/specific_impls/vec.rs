@@ -1,5 +1,6 @@
 use crate::linear::scalar::Scalar;
 use crate::linear::vec::Vector;
+use crate::linear::bivec::Bivector2;
 
 impl<T: Scalar> Vector<T, 2> {
     pub fn add_fast(&self, rhs: Self) -> Self {
@@ -25,6 +26,15 @@ impl<T: Scalar> Vector<T, 2> {
             data: [self[0] / rhs, self[1] / rhs],
         }
     }
+
+    pub fn dot_fast(&self, rhs: Self) -> T {
+        (self[0] * rhs[0]) + (self[1] * rhs[0])
+    }
+
+    #[inline]
+    pub fn wedge(&self, other: Self) -> Bivector2<T> {
+        Bivector2 { data: (self[0] * other[1]) - (other[0] * self[1]) }
+    }
 }
 
 impl<T: Scalar> Vector<T, 3> {
@@ -46,10 +56,16 @@ impl<T: Scalar> Vector<T, 3> {
         }
     }
 
+    #[inline]
     pub fn div_fast(&self, rhs: T) -> Self {
         Self {
             data: [self[0] / rhs, self[1] / rhs, self[2] / rhs],
         }
+    }
+
+    #[inline]
+    pub fn dot_fast(&self, other: Self) -> T {
+        (self[0] * other[0]) + (self[1] * other[1]) + (self[2] * other[2])
     }
 }
 

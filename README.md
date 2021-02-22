@@ -20,3 +20,11 @@
 
 * this project is under heavy development and not really usable from a consumer-perspective 
   right now. Expect many breaking updates as architecture and features are not decided yet.
+  
+  
+#### Credit
+This project is inspired by multiple other crates and I want to thank them:
+* num-traits
+* nalgebra
+* ultraviolet
+* ndarry

@@ -1,7 +1,5 @@
 use crate::linear::scalar::Scalar;
 use crate::linear::vec::Vector;
-#[cfg(feature = "serde")]
-use serde::{Deserialize, Serialize};
 use std::alloc::Layout;
 use std::fmt::{Display, Formatter};
 use std::ops::{Add, Mul, Sub};
@@ -10,7 +8,6 @@ pub type SquareMatrix<T, const N: usize> = Matrix<T, { N }, { N }>;
 
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Matrix<T, const M: usize, const N: usize> {
     pub data: [Vector<T, { M }>; N],
 }

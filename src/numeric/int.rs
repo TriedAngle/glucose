@@ -1,6 +1,6 @@
 use crate::numeric::bit::BitNum;
 use crate::numeric::num::Num;
-use std::ops::{BitAnd, BitOr, BitXor, Not, Shl, Shr};
+use std::ops::{BitAnd, BitOr, BitXor, Not, Shl, Shr, Neg};
 
 pub trait Int: Num + BitNum + PartialOrd + Ord + Eq + Copy {
     fn count_zeros(self) -> u32;

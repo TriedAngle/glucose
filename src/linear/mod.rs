@@ -10,6 +10,7 @@ pub mod rotor;
 pub mod scalar;
 pub mod specific_impls;
 pub mod vec;
+pub mod dynamic;
 
 pub fn from_float<T: Scalar + From<U>, U: Scalar + Float>(val: U) -> T {
     From::from(val)

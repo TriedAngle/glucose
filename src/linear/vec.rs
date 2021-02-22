@@ -4,8 +4,6 @@ use crate::numeric::cmp::Cmp;
 use crate::numeric::float::Float;
 use crate::numeric::sign::Signed;
 use paste::paste;
-#[cfg(feature = "serde")]
-use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter};
 use std::iter::Sum;
 use std::ops::{Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, Sub, SubAssign};
@@ -13,8 +11,7 @@ use std::ops::{Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, 
 pub type Point<T, const N: usize> = Vector<T, { N }>;
 
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Vector<T, const N: usize> {
     pub data: [T; N],
 }
@@ -418,6 +415,15 @@ impl<T, const N: usize> IndexMut<usize> for Vector<T, { N }> {
     }
 }
 
+impl<T: Default + Copy, const N: usize> From<Vec<T>> for Vector<T, { N }> {
+    fn from(rhs: Vec<T>) -> Self {
+        let mut vec = Self::default();
+        for (i, k) in rhs.iter().enumerate() {
+           vec[i] = *k;
+        }
+        vec
+    }
+}
 #[macro_export]
 macro_rules! vec_short {
     ($($n:ident => $t:ty),+) => {

@@ -18,3 +18,4 @@ path = "src/lib.rs"
 paste = "1.0.4"
 bytemuck = { version = "1.5.1", optional = true }
 serde = { version = "1.0.123", optional = true }
+serde_test = "1.0.123"

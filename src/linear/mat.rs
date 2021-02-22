@@ -8,6 +8,7 @@ pub type SquareMatrix<T, const N: usize> = Matrix<T, { N }, { N }>;
 
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Matrix<T, const M: usize, const N: usize> {
     pub data: [Vector<T, { M }>; N],
 }

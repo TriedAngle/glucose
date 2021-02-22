@@ -9,6 +9,7 @@ use crate::numeric::mul_add::MulAdd;
 use crate::numeric::trig::Trig;
 
 #[derive(Debug, Copy, Clone)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Rotor2<S> {
     pub scalar: S,
     pub bivector: Bivector2<S>,

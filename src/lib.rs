@@ -1,14 +1,14 @@
 #![allow(unused)]
 
+mod impls;
 mod linear;
 pub mod numeric;
-mod impls;
 
-pub use linear::vec::{Vector, Point};
-pub use linear::scalar::{Scalar, Two};
 pub use linear::bivec::Bivector2;
 pub use linear::mat::{Matrix, SquareMatrix};
 pub use linear::rotor::Rotor2;
+pub use linear::scalar::{Scalar, Two};
+pub use linear::vec::{Point, Vector};
 
 pub use numeric as num;
 

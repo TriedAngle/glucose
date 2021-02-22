@@ -12,6 +12,7 @@ pub type Point<T, const N: usize> = Vector<T, { N }>;
 
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Vector<T, const N: usize> {
     pub data: [T; N],
 }

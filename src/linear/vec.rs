@@ -4,6 +4,8 @@ use crate::numeric::cmp::Cmp;
 use crate::numeric::float::Float;
 use crate::numeric::sign::Signed;
 use paste::paste;
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter};
 use std::iter::Sum;
 use std::ops::{Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, Sub, SubAssign};

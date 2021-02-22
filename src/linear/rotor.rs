@@ -7,6 +7,8 @@ use crate::numeric::float::Float;
 use crate::numeric::identity::Zero;
 use crate::numeric::mul_add::MulAdd;
 use crate::numeric::trig::Trig;
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Copy, Clone)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]

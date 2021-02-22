@@ -1,5 +1,7 @@
 use crate::linear::scalar::Scalar;
 use crate::linear::vec::Vector;
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 use std::alloc::Layout;
 use std::fmt::{Display, Formatter};
 use std::ops::{Add, Mul, Sub};

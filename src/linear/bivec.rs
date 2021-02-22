@@ -1,8 +1,9 @@
 use crate::linear::scalar::Scalar;
 use crate::numeric::float::Float;
 use crate::numeric::identity::{One, Zero};
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
-
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]

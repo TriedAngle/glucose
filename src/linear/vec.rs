@@ -419,7 +419,7 @@ impl<T: Default + Copy, const N: usize> From<Vec<T>> for Vector<T, { N }> {
     fn from(rhs: Vec<T>) -> Self {
         let mut vec = Self::default();
         for (i, k) in rhs.iter().enumerate() {
-           vec[i] = *k;
+            vec[i] = *k;
         }
         vec
     }

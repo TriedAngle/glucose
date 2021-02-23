@@ -1,12 +1,15 @@
-use crate::numeric::int::Int;
-use std::ops::Neg;
-use crate::num::num::NumAssignOps;
-use std::fmt::Debug;
-use crate::Matrix;
 use crate::linear::dynamic::DMatrix;
+use crate::num::num::NumAssignOps;
+use crate::numeric::int::Int;
+use crate::Matrix;
+use std::fmt::Debug;
+use std::ops::Neg;
 
 /// input: a < b
-pub fn extended_euclidean_algorithm<T: Int + NumAssignOps + Neg<Output = T>>(mut a: T, mut b: T) -> (T, T) {
+pub fn extended_euclidean_algorithm<T: Int + NumAssignOps + Neg<Output = T>>(
+    mut a: T,
+    mut b: T,
+) -> (T, T) {
     assert!(a < b);
     let mut ks = Vec::new();
     let mut k = T::zero();
@@ -29,8 +32,10 @@ pub fn extended_euclidean_algorithm<T: Int + NumAssignOps + Neg<Output = T>>(mut
     (s, t)
 }
 
-pub fn extended_euclidean_algorithm_with_steps<T: Int + NumAssignOps + Neg<Output = T>>(mut a: T, mut b: T)
-    -> (Vec<(T, T)>, Vec<T>, Vec<(T, T)>) {
+pub fn extended_euclidean_algorithm_with_steps<T: Int + NumAssignOps + Neg<Output = T>>(
+    mut a: T,
+    mut b: T,
+) -> (Vec<(T, T)>, Vec<T>, Vec<(T, T)>) {
     assert!(a < b);
     let mut ks = Vec::new();
     let mut abs = vec![(a, b)];
@@ -59,7 +64,10 @@ pub fn extended_euclidean_algorithm_with_steps<T: Int + NumAssignOps + Neg<Outpu
     (abs, ks, sts)
 }
 
-pub fn extended_euclidean_as_dmatrix<T: Int + NumAssignOps + Neg<Output = T>>(a: T, b: T) -> DMatrix<T>{
+pub fn extended_euclidean_as_dmatrix<T: Int + NumAssignOps + Neg<Output = T>>(
+    a: T,
+    b: T,
+) -> DMatrix<T> {
     let (abs, mut ks, sts) = extended_euclidean_algorithm_with_steps(a, b);
     ks.push(-T::one());
     let a_vec = abs.iter().map(|(a, b)| *a).collect();

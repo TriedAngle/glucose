@@ -1,6 +1,7 @@
 use crate::{Scalar, Vector};
-use std::fmt::{Display, Formatter};
+use std::fmt::{Debug, Display, Formatter};
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
+use std::str::FromStr;
 
 #[derive(Debug, Clone)]
 pub struct DVector<T> {
@@ -135,9 +136,9 @@ impl<T: Scalar> Add for DMatrix<T> {
     fn add(self, rhs: Self) -> Self::Output {
         assert_eq!(self.size, rhs.size);
         let mut mat = self.clone();
-        for i in 0..self.size.1 {
-            for j in 0..self.size.0 {
-                mat.data[j][i] += rhs.data[j][i];
+        for n in 0..self.size.1 {
+            for m in 0..self.size.0 {
+                mat.data[n][m] += rhs.data[n][m];
             }
         }
         mat
@@ -147,9 +148,9 @@ impl<T: Scalar> Add for DMatrix<T> {
 impl<T: Scalar> AddAssign for DMatrix<T> {
     fn add_assign(&mut self, rhs: Self) {
         assert_eq!(self.size, rhs.size);
-        for i in 0..self.size.1 {
-            for j in 0..self.size.0 {
-                self.data[j][i] += rhs.data[j][i];
+        for n in 0..self.size.1 {
+            for m in 0..self.size.0 {
+                self.data[n][m] += rhs.data[n][m];
             }
         }
     }
@@ -315,9 +316,68 @@ impl<T: Display + Copy> Display for DMatrix<T> {
     }
 }
 
+impl<T: FromStr + Default> From<&str> for DVector<T> {
+    fn from(rhs: &str) -> Self {
+        let data = rhs
+            .split(" ")
+            .map(|val| val.parse::<T>().unwrap_or_else(|t| <T>::default()))
+            .collect::<Vec<T>>();
+
+        let len = data.len();
+        Self { data, len }
+    }
+}
+
+impl<T: FromStr + Default> From<String> for DVector<T> {
+    fn from(rhs: String) -> Self {
+        let data = rhs
+            .split(" ")
+            .map(|val| val.parse::<T>().unwrap_or_else(|t| <T>::default()))
+            .collect::<Vec<T>>();
+
+        let len = data.len();
+        Self { data, len }
+    }
+}
+
+impl<T: FromStr + Default> From<String> for DMatrix<T> {
+    fn from(rhs: String) -> Self {
+        let cols_str = rhs.split(";").collect::<Vec<&str>>();
+        let cols_t = cols_str
+            .iter()
+            .map(|str| {
+                str.split(" ")
+                    .map(|val| val.parse::<T>().unwrap_or_else(|t| <T>::default()))
+                    .collect::<Vec<T>>()
+            })
+            .collect::<Vec<Vec<T>>>();
+
+        let size = (cols_t[0].len(), cols_t.len());
+        Self { data: cols_t, size }
+    }
+}
+
+impl<T: FromStr + Default> From<&str> for DMatrix<T> {
+    fn from(rhs: &str) -> Self {
+        let cols_t = rhs
+            .split(";")
+            .into_iter()
+            .map(|str| {
+                str.split(" ")
+                    .map(|val| val.parse::<T>().unwrap_or_else(|t| <T>::default()))
+                    .collect::<Vec<T>>()
+            })
+            .collect::<Vec<Vec<T>>>();
+
+        let size = (cols_t[0].len(), cols_t.len());
+        Self { data: cols_t, size }
+    }
+}
+
 #[cfg(test)]
 mod dynamic_mat_tests {
     use crate::linear::dynamic::DMatrix;
+    use crate::DVector;
 
     #[test]
     fn add() {
@@ -343,12 +403,16 @@ mod dynamic_mat_tests {
     #[test]
     fn from_arr() {
         let mat2 = DMatrix::from([[7.0, 9.0, 11.0], [8.0, 10.0, 12.0]]);
-        println!("{}", mat2)
+    }
+
+    #[test]
+    fn from_str() {
+        let mat1 = DMatrix::<f64>::from("4 3 2;2 2 -1");
+        let mat2 = DMatrix::<f64>::from("-2.5 3 2;-2 2.5 3");
+        let mat = mat1 + mat2;
+
+        let vec1 = DVector::<f64>::from("4 3 2");
+        let vec2 = DVector::<f64>::from("-2.5 3 2");
+        let vec = vec1 + vec2;
     }
 }
-
-//   ----> N
-//  | 3  2 |
-//  | 1  4 |
-//  | 2  9 |
-//

@@ -2,7 +2,7 @@ use crate::linear::scalar::Scalar;
 use crate::linear::vec::Vector;
 use std::alloc::Layout;
 use std::fmt::{Display, Formatter};
-use std::ops::{Add, Mul, Sub};
+use std::ops::{Add, Div, DivAssign, Mul, MulAssign, Sub};
 
 pub type SquareMatrix<T, const N: usize> = Matrix<T, { N }, { N }>;
 
@@ -177,6 +177,54 @@ impl<T, const M: usize> From<Vector<T, { M }>> for Matrix<T, { M }, 1> {
     fn from(rhs: Vector<T, { M }>) -> Self {
         let data = [rhs];
         Self { data }
+    }
+}
+
+impl<T: Scalar, const M: usize, const N: usize> Mul<T> for Matrix<T, { M }, { N }> {
+    type Output = Self;
+
+    fn mul(self, rhs: T) -> Self::Output {
+        let mut mat = self;
+        for m in 0..M {
+            for n in 0..N {
+                mat.data[m][n] *= rhs
+            }
+        }
+        self
+    }
+}
+
+impl<T: Scalar, const M: usize, const N: usize> MulAssign<T> for Matrix<T, { M }, { N }> {
+    fn mul_assign(&mut self, rhs: T) {
+        for m in 0..M {
+            for n in 0..N {
+                self.data[m][n] *= rhs
+            }
+        }
+    }
+}
+
+impl<T: Scalar, const M: usize, const N: usize> Div<T> for Matrix<T, { M }, { N }> {
+    type Output = Self;
+
+    fn div(self, rhs: T) -> Self::Output {
+        let mut mat = self;
+        for m in 0..M {
+            for n in 0..N {
+                mat.data[m][n] /= rhs
+            }
+        }
+        self
+    }
+}
+
+impl<T: Scalar, const M: usize, const N: usize> DivAssign<T> for Matrix<T, { M }, { N }> {
+    fn div_assign(&mut self, rhs: T) {
+        for m in 0..M {
+            for n in 0..N {
+                self.data[m][n] /= rhs
+            }
+        }
     }
 }
 

@@ -1,6 +1,6 @@
 use crate::{Scalar, Vector};
 use std::fmt::{Display, Formatter};
-use std::ops::{Add, AddAssign, Mul, MulAssign, Sub, SubAssign};
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 
 #[derive(Debug, Clone)]
 pub struct DVector<T> {
@@ -238,6 +238,54 @@ impl<T: Scalar> Mul<DVector<T>> for DMatrix<T> {
 
     fn mul(self, rhs: DVector<T>) -> Self::Output {
         DVector::from(self * DMatrix::from(rhs))
+    }
+}
+
+impl<T: Scalar> Mul<T> for DMatrix<T> {
+    type Output = Self;
+
+    fn mul(self, rhs: T) -> Self::Output {
+        let mut mat = self.clone();
+        for m in 0..self.size.0 {
+            for n in 0..self.size.1 {
+                mat.data[m][n] *= rhs
+            }
+        }
+        self
+    }
+}
+
+impl<T: Scalar> MulAssign<T> for DMatrix<T> {
+    fn mul_assign(&mut self, rhs: T) {
+        for m in 0..self.size.0 {
+            for n in 0..self.size.1 {
+                self.data[m][n] *= rhs
+            }
+        }
+    }
+}
+
+impl<T: Scalar> Div<T> for DMatrix<T> {
+    type Output = Self;
+
+    fn div(self, rhs: T) -> Self::Output {
+        let mut mat = self.clone();
+        for m in 0..self.size.0 {
+            for n in 0..self.size.1 {
+                mat.data[m][n] /= rhs
+            }
+        }
+        self
+    }
+}
+
+impl<T: Scalar> DivAssign<T> for DMatrix<T> {
+    fn div_assign(&mut self, rhs: T) {
+        for m in 0..self.size.0 {
+            for n in 0..self.size.1 {
+                self.data[m][n] /= rhs
+            }
+        }
     }
 }
 

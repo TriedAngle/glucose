@@ -151,8 +151,8 @@ impl<T: Scalar> Add for DMatrix<T> {
     fn add(self, rhs: Self) -> Self::Output {
         assert_eq!(self.size, rhs.size);
         let mut mat = self.clone();
-        for n in 0..self.size.1 {
-            for m in 0..self.size.0 {
+        for m in 0..self.size.0 {
+            for n in 0..self.size.1 {
                 mat.data[n][m] += rhs.data[n][m];
             }
         }
@@ -163,8 +163,8 @@ impl<T: Scalar> Add for DMatrix<T> {
 impl<T: Scalar> AddAssign for DMatrix<T> {
     fn add_assign(&mut self, rhs: Self) {
         assert_eq!(self.size, rhs.size);
-        for n in 0..self.size.1 {
-            for m in 0..self.size.0 {
+        for m in 0..self.size.0 {
+            for n in 0..self.size.1 {
                 self.data[n][m] += rhs.data[n][m];
             }
         }
@@ -177,9 +177,9 @@ impl<T: Scalar> Sub for DMatrix<T> {
     fn sub(self, rhs: Self) -> Self::Output {
         assert_eq!(self.size, rhs.size);
         let mut mat = self.clone();
-        for i in 0..self.size.1 {
-            for j in 0..self.size.0 {
-                mat.data[j][i] -= rhs.data[j][i];
+        for m in 0..self.size.0 {
+            for n in 0..self.size.1 {
+                mat.data[n][m] -= rhs.data[n][m];
             }
         }
         mat
@@ -189,9 +189,9 @@ impl<T: Scalar> Sub for DMatrix<T> {
 impl<T: Scalar> SubAssign for DMatrix<T> {
     fn sub_assign(&mut self, rhs: Self) {
         assert_eq!(self.size, rhs.size);
-        for i in 0..self.size.1 {
-            for j in 0..self.size.0 {
-                self.data[j][i] -= rhs.data[j][i];
+        for m in 0..self.size.0 {
+            for n in 0..self.size.1 {
+                self.data[n][m] -= rhs.data[n][m];
             }
         }
     }

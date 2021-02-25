@@ -114,6 +114,21 @@ impl<T> DMatrix<T> {
     }
 }
 
+impl<T: ToString> DMatrix<T> {
+    pub fn to_string_vec(&self) -> DMatrix<String> {
+        let data_str: Vec<Vec<String>> = self
+            .data
+            .iter()
+            .map(|col| col.iter().map(|val| val.to_string()).collect())
+            .collect();
+
+        DMatrix {
+            data: data_str,
+            size: self.size,
+        }
+    }
+}
+
 impl<T: Default> Default for DMatrix<T> {
     fn default() -> Self {
         Self {

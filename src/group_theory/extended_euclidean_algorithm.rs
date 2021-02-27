@@ -86,7 +86,6 @@ mod euclidean_algo_tests {
     fn algo() {
         let (a, b) = (935, 1491);
         let (s, t) = extended_euclidean_algorithm(a, b);
-
         assert_eq!(s, 716);
         assert_eq!(t, -449);
     }
@@ -95,16 +94,11 @@ mod euclidean_algo_tests {
     fn algo_with_steps() {
         let (a, b) = (935, 1491);
         let (abs, ks, sts) = extended_euclidean_algorithm_with_steps(a, b);
-        println!("{:?}", abs);
-        println!("{:?}", ks);
-        println!("{:?}", sts);
     }
 
     #[test]
     fn algo_matrix() {
         let (a, b) = (935, 1491);
         let mat = extended_euclidean_as_dmatrix(a, b);
-        println!("{:?}", mat);
-        println!("{}", mat)
     }
 }

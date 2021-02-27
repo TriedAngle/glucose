@@ -92,14 +92,41 @@ pub fn orders(modulo: i64, coprimes: &[i64], multiplicative: bool) -> Vec<(i64, 
     }
 }
 
-// pub fn producers(Vec)
+pub fn group_size(modulo: i64, multiplicative: bool) -> i64 {
+    match multiplicative {
+        true => coprimes(modulo).len() as i64,
+        false => unimplemented!(),
+    }
+}
+
+pub fn possible_orders(modulo: i64, multiplicative: bool) -> Vec<i64> {
+    let mut possible_orders = Vec::new();
+    match multiplicative {
+        true => {
+            let group_size = group_size(modulo, multiplicative);
+            for i in 1..group_size + 1 {
+                if group_size % i == 0 {
+                    possible_orders.push(i);
+                }
+            }
+        }
+        false => unimplemented!(),
+    }
+    possible_orders
+}
+//
+// pub fn has_producers(modulo: i64) -> bool {
+//
+// }
 
 #[test]
 fn test() {
-    // println!("{:?}", wheel_factorization(743094734));
-    // println!("{:?}", is_prime(677533));
-    let coprimes = coprimes(225);
-    let orders = orders(225, &coprimes, true);
-    println!("{:?}, {}", coprimes, coprimes.len());
-    println!("{:?}", orders);
+    let prime_factorization = wheel_factorization(16);
+    let coprimes = coprimes(16);
+    let possible_orders = possible_orders(16, true);
+    let orders = orders(16, &coprimes, true);
+    println!("prime factors of n: {:?}", prime_factorization);
+    println!("coprimes: {} := {:?}", coprimes.len(), coprimes);
+    println!("possible orders: {:?}", possible_orders);
+    println!("actual order: {:?}", orders);
 }

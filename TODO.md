@@ -7,23 +7,28 @@ Can change any time
 - [x] Matrices
 - [x] Dynamic Vectors
 - [x] Dynamic Matrices
+- [ ] basic "specialisation" by wrapper types for N < 9
+
+- [x] coprimes // TODO: generify
+- [x] primfaktorzerlegung // TODO: generify
+- [ ] erzeuger finden // TODO: generify
+- [x] extended euclidean algorithm
+
 - [ ] 2D Bivector (partially implement already)
 - [ ] 3D Bivector
 - [ ] 2D Rotor (partially implement already)
 - [ ] 3D Rotor
 - [ ] n dim rotors and bivectors
 - [ ] Quaternions
-- [x] extended euclidean algorithm
+
 - [ ] stirling numbers
-- [ ] DPLL + DPLL Resulution
-- [ ] Vector Trait
-- [ ] Matrix Trait
+- [ ] DPLL + DPLL Resolution
 - [ ] Real Number Trait
 - [ ] Matrix Determinant
 - [ ] LU Decomposition
 - [ ] Complex Numbers
 - [ ] correct number theory rewrite of the numeric traits
-- [ ] replacement for specialization (wrapper types for N < 9 ?)
+- [ ] correct algebraic structure write of vector and matrix traits
 - [ ] more tests
 
 library implementations:

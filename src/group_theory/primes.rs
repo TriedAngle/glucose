@@ -1,7 +1,7 @@
 use crate::num::int::Int;
 use crate::num::num::NumAssignOps;
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum GroupType {
     Additive,
     Multiplicative,
@@ -232,15 +232,15 @@ fn is_producer_mul(modulo: i64, num: i64, group_size: i64) -> bool {
 
 #[test]
 fn test() {
-    let modulo = 2021;
-    let kind = GroupType::Additive;
+    let modulo = 54;
+    let kind = GroupType::MultiplicativeStar;
     let prime_factorization = wheel_factorization(modulo);
     let group_size = group_size(modulo, kind);
     let group_size_factorization = wheel_factorization(group_size);
     let group = group(modulo, kind);
     let possible_orders = possible_orders(modulo, kind);
     let orders = orders(modulo, &group, kind);
-    let producers = producers(modulo, &group, kind, true);
+    let producers = producers(modulo, &group, kind, false);
 
     println!("modulo: {}", modulo);
     println!("group type: {:?}", kind);

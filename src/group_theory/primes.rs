@@ -1,6 +1,13 @@
 use crate::num::int::Int;
 use crate::num::num::NumAssignOps;
 
+#[derive(Debug, Copy, Clone)]
+pub enum GroupType {
+    Additive,
+    Multiplicative,
+    MultiplicativeStar,
+}
+
 // TODO: generify
 pub fn wheel_factorization(mut num: i64) -> Vec<i64> {
     let mut primes = Vec::new();
@@ -59,74 +66,162 @@ pub fn coprimes(modulo: i64) -> Vec<i64> {
     coprimes
 }
 
+pub fn group_size(modulo: i64, kind: GroupType) -> i64 {
+    match kind {
+        GroupType::Additive => modulo,
+        GroupType::Multiplicative => modulo,
+        GroupType::MultiplicativeStar => coprimes(modulo).len() as i64,
+    }
+}
+
+pub fn group(modulo: i64, kind: GroupType) -> Vec<i64> {
+    match kind {
+        GroupType::Additive => (0..modulo).into_iter().collect(),
+        GroupType::Multiplicative => (0..modulo).into_iter().collect(),
+        GroupType::MultiplicativeStar => coprimes(modulo),
+    }
+}
+
 // returns (coprime, order)
-pub fn order_multiplicative(modulo: i64, coprime: i64) -> (i64, i64) {
+pub fn order_multiplicative(modulo: i64, num: i64) -> (i64, i64) {
     let mut order = 0;
     let mut tmp = 1;
+    if num == 0 {
+        return (num, 1);
+    }
     loop {
-        tmp *= coprime;
+        tmp *= num;
         tmp %= modulo;
         order += 1;
         if tmp == 1 {
             break;
         }
     }
-    (coprime, order)
+    (num, order)
 }
 
-//TODO
-pub fn order_additive(modulo: i64, coprime: i64) -> (i64, i64) {
-    unimplemented!()
+pub fn order_additive(modulo: i64, num: i64) -> (i64, i64) {
+    let mut order = 0;
+    let mut tmp = 1;
+    loop {
+        tmp += num;
+        tmp %= modulo;
+        order += 1;
+        if tmp == 1 {
+            break;
+        }
+    }
+    (num, order)
 }
 
-pub fn orders(modulo: i64, coprimes: &[i64], multiplicative: bool) -> Vec<(i64, i64)> {
-    match multiplicative {
-        true => coprimes
+pub fn orders(modulo: i64, group: &[i64], kind: GroupType) -> Vec<(i64, i64)> {
+    match kind {
+        GroupType::Additive => group
+            .iter()
+            .map(|num| order_additive(modulo, *num))
+            .collect(),
+        GroupType::Multiplicative => group
+            .iter()
+            .map(|num| order_multiplicative(modulo, *num))
+            .collect(),
+        GroupType::MultiplicativeStar => group
             .iter()
             .map(|coprime| order_multiplicative(modulo, *coprime))
             .collect(),
-        false => coprimes
-            .iter()
-            .map(|coprime| order_additive(modulo, *coprime))
-            .collect(),
     }
 }
 
-pub fn group_size(modulo: i64, multiplicative: bool) -> i64 {
-    match multiplicative {
-        true => coprimes(modulo).len() as i64,
-        false => unimplemented!(),
-    }
-}
-
-pub fn possible_orders(modulo: i64, multiplicative: bool) -> Vec<i64> {
+pub fn possible_orders(modulo: i64, kind: GroupType) -> Vec<i64> {
     let mut possible_orders = Vec::new();
-    match multiplicative {
-        true => {
-            let group_size = group_size(modulo, multiplicative);
-            for i in 1..group_size + 1 {
-                if group_size % i == 0 {
-                    possible_orders.push(i);
-                }
-            }
+    let group_size = group_size(modulo, kind);
+    for i in 1..group_size + 1 {
+        if group_size % i == 0 {
+            possible_orders.push(i);
         }
-        false => unimplemented!(),
     }
     possible_orders
 }
-//
-// pub fn has_producers(modulo: i64) -> bool {
-//
-// }
+
+pub fn producers(modulo: i64, group: &[i64], kind: GroupType) -> Vec<i64> {
+    let group_size = group.len() as i64;
+    let mut producers = Vec::new();
+
+    match kind {
+        GroupType::Additive => {
+            let mut group_size_factors = wheel_factorization(group_size);
+            group_size_factors.dedup();
+            producers.push(1);
+            for e in group {
+                let mut can_add = true;
+                for factor in &group_size_factors {
+                    if e * (group_size / factor) % modulo == 1 {
+                        can_add = false;
+                        break;
+                    }
+                }
+                if can_add {
+                    producers.push(*e)
+                }
+            }
+            let zero = producers.iter().position(|x| *x == 0);
+            if zero.is_some() {
+                producers.remove(zero.unwrap());
+            }
+        }
+        GroupType::Multiplicative => {
+            let mut group_size_factors = wheel_factorization(group_size);
+            group_size_factors.dedup();
+            for e in group {
+                let mut can_add = true;
+                for factor in &group_size_factors {
+                    if e.pow((group_size / factor) as u32) % modulo == 1 {
+                        can_add = false;
+                        break;
+                    }
+                }
+                if can_add {
+                    producers.push(*e)
+                }
+            }
+        }
+        GroupType::MultiplicativeStar => {
+            let mut group_size_factors = wheel_factorization(group_size);
+            group_size_factors.dedup();
+            for e in group {
+                let mut can_add = true;
+                for factor in &group_size_factors {
+                    if e.pow((group_size / factor) as u32) % modulo == 1 {
+                        can_add = false;
+                        break;
+                    }
+                }
+                if can_add {
+                    producers.push(*e)
+                }
+            }
+        }
+    }
+    producers
+}
 
 #[test]
 fn test() {
-    let prime_factorization = wheel_factorization(16);
-    let coprimes = coprimes(16);
-    let possible_orders = possible_orders(16, true);
-    let orders = orders(16, &coprimes, true);
+    let modulo = 5;
+    let kind = GroupType::Additive;
+    let prime_factorization = wheel_factorization(modulo);
+    let group_size = group_size(modulo, kind);
+    let group_size_factorization = wheel_factorization(group_size);
+    let group = group(modulo, kind);
+    let possible_orders = possible_orders(modulo, kind);
+    let orders = orders(modulo, &group, kind);
+    let producers = producers(modulo, &group, kind);
+
+    println!("modulo: {}", modulo);
+    println!("group type: {:?}", kind);
     println!("prime factors of n: {:?}", prime_factorization);
-    println!("coprimes: {} := {:?}", coprimes.len(), coprimes);
+    println!("group size: {} := {:?}", group_size, group);
+    println!("group size prime factors: {:?}", group_size_factorization);
     println!("possible orders: {:?}", possible_orders);
     println!("actual order: {:?}", orders);
+    println!("producers: {:?}", producers);
 }

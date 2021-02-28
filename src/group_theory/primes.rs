@@ -142,7 +142,7 @@ pub fn possible_orders(modulo: i64, kind: GroupType) -> Vec<i64> {
     possible_orders
 }
 
-pub fn producers(modulo: i64, group: &[i64], kind: GroupType) -> Vec<i64> {
+pub fn producers(modulo: i64, group: &[i64], kind: GroupType, big: bool) -> Vec<i64> {
     let group_size = group.len() as i64;
     let mut producers = Vec::new();
 
@@ -150,7 +150,6 @@ pub fn producers(modulo: i64, group: &[i64], kind: GroupType) -> Vec<i64> {
         GroupType::Additive => {
             let mut group_size_factors = wheel_factorization(group_size);
             group_size_factors.dedup();
-            producers.push(1);
             for e in group {
                 let mut can_add = true;
                 for factor in &group_size_factors {
@@ -167,36 +166,49 @@ pub fn producers(modulo: i64, group: &[i64], kind: GroupType) -> Vec<i64> {
             if zero.is_some() {
                 producers.remove(zero.unwrap());
             }
+            if !producers.contains(&1) && group.contains(&1) {
+                producers.insert(0, 1);
+            }
         }
         GroupType::Multiplicative => {
-            let mut group_size_factors = wheel_factorization(group_size);
-            group_size_factors.dedup();
-            for e in group {
-                let mut can_add = true;
-                for factor in &group_size_factors {
-                    if e.pow((group_size / factor) as u32) % modulo == 1 {
-                        can_add = false;
-                        break;
+            if big {
+                group.iter().filter(|num| is_producer_mul(modulo, **num, group_size))
+                    .for_each(|num| producers.push(*num))
+            } else {
+                let mut group_size_factors = wheel_factorization(group_size);
+                group_size_factors.dedup();
+                for e in group {
+                    let mut can_add = true;
+                    for factor in &group_size_factors {
+                        if e.pow((group_size / factor) as u32) % modulo == 1 {
+                            can_add = false;
+                            break;
+                        }
                     }
-                }
-                if can_add {
-                    producers.push(*e)
+                    if can_add {
+                        producers.push(*e)
+                    }
                 }
             }
         }
         GroupType::MultiplicativeStar => {
-            let mut group_size_factors = wheel_factorization(group_size);
-            group_size_factors.dedup();
-            for e in group {
-                let mut can_add = true;
-                for factor in &group_size_factors {
-                    if e.pow((group_size / factor) as u32) % modulo == 1 {
-                        can_add = false;
-                        break;
+            if big {
+                group.iter().filter(|num| is_producer_mul(modulo, **num, group_size))
+                    .for_each(|num| producers.push(*num))
+            } else {
+                let mut group_size_factors = wheel_factorization(group_size);
+                group_size_factors.dedup();
+                for e in group {
+                    let mut can_add = true;
+                    for factor in &group_size_factors {
+                        if e.pow((group_size / factor) as u32) % modulo == 1 {
+                            can_add = false;
+                            break;
+                        }
                     }
-                }
-                if can_add {
-                    producers.push(*e)
+                    if can_add {
+                        producers.push(*e)
+                    }
                 }
             }
         }
@@ -204,9 +216,23 @@ pub fn producers(modulo: i64, group: &[i64], kind: GroupType) -> Vec<i64> {
     producers
 }
 
+fn is_producer_mul(modulo: i64, num: i64, group_size: i64) -> bool {
+    let mut counter = 0;
+    let mut tmp = 1;
+    loop {
+        tmp *= num;
+        tmp %= modulo;
+        counter += 1;
+        if tmp == 1 {
+            break;
+        }
+    }
+    counter == group_size
+}
+
 #[test]
 fn test() {
-    let modulo = 5;
+    let modulo = 2021;
     let kind = GroupType::Additive;
     let prime_factorization = wheel_factorization(modulo);
     let group_size = group_size(modulo, kind);
@@ -214,7 +240,7 @@ fn test() {
     let group = group(modulo, kind);
     let possible_orders = possible_orders(modulo, kind);
     let orders = orders(modulo, &group, kind);
-    let producers = producers(modulo, &group, kind);
+    let producers = producers(modulo, &group, kind, true);
 
     println!("modulo: {}", modulo);
     println!("group type: {:?}", kind);

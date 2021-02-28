@@ -100,6 +100,23 @@ pub fn order_multiplicative(modulo: i64, num: i64) -> (i64, i64) {
     (num, order)
 }
 
+pub fn order_multiplicative_2(modulo: i64, num: i64) -> (i64, i64) {
+    let mut order = 0;
+    let mut tmp = 1;
+    if num == 0 {
+        return (num, 1);
+    }
+    loop {
+        tmp *= num;
+        tmp %= modulo;
+        order += 1;
+        if tmp == 1 || order >= modulo {
+            break;
+        }
+    }
+    (num, order)
+}
+
 pub fn order_additive(modulo: i64, num: i64) -> (i64, i64) {
     let mut order = 0;
     let mut tmp = 1;
@@ -122,7 +139,7 @@ pub fn orders(modulo: i64, group: &[i64], kind: GroupType) -> Vec<(i64, i64)> {
             .collect(),
         GroupType::Multiplicative => group
             .iter()
-            .map(|num| order_multiplicative(modulo, *num))
+            .map(|num| order_multiplicative_2(modulo, *num))
             .collect(),
         GroupType::MultiplicativeStar => group
             .iter()
@@ -172,7 +189,7 @@ pub fn producers(modulo: i64, group: &[i64], kind: GroupType, big: bool) -> Vec<
         }
         GroupType::Multiplicative => {
             if big {
-                group.iter().filter(|num| is_producer_mul(modulo, **num, group_size))
+                group.iter().filter(|num| is_producer_mul_2(modulo, **num, group_size))
                     .for_each(|num| producers.push(*num))
             } else {
                 let mut group_size_factors = wheel_factorization(group_size);
@@ -230,9 +247,23 @@ fn is_producer_mul(modulo: i64, num: i64, group_size: i64) -> bool {
     counter == group_size
 }
 
+fn is_producer_mul_2(modulo: i64, num: i64, group_size: i64) -> bool {
+    let mut counter = 0;
+    let mut tmp = 1;
+    loop {
+        tmp *= num;
+        tmp %= modulo;
+        counter += 1;
+        if tmp == 1 || counter >= modulo {
+            break;
+        }
+    }
+    counter == group_size
+}
+
 #[test]
 fn test() {
-    let modulo = 54;
+    let modulo = 17;
     let kind = GroupType::MultiplicativeStar;
     let prime_factorization = wheel_factorization(modulo);
     let group_size = group_size(modulo, kind);
@@ -250,4 +281,17 @@ fn test() {
     println!("possible orders: {:?}", possible_orders);
     println!("actual order: {:?}", orders);
     println!("producers: {:?}", producers);
+}
+
+#[test]
+fn test2() {
+    let modulo = 5;
+    let kind = GroupType::Multiplicative;
+    // // let prime_factorization = wheel_factorization(modulo);
+    // // let group_size = group_size(modulo, kind);
+    // // let group_size_factorization = wheel_factorization(group_size);
+    let group = group(modulo, kind);
+    // let possible_orders = possible_orders(modulo, kind);
+    let orders = orders(modulo, &group, kind);
+    let producers = producers(modulo, &group, kind, false);
 }

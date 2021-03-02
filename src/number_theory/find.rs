@@ -1,18 +1,14 @@
+use crate::number_theory::euclid::ea;
+
 // TODO: generify
 // TODO: use EA for this
+#[inline]
 pub fn gcd(a: i64, b: i64) -> i64 {
-    let mut i = 1;
-    let mut gcd = 1;
-    while i <= a && i <= b {
-        if a % i == 0 && b % i == 0 {
-            gcd = i;
-        }
-        i += 1;
-    }
-    return gcd;
+    ea(a, b)
 }
 
 // TODO: generify
+#[inline]
 pub fn lcm(a: i64, b: i64) -> i64 {
     (a * b).abs() / gcd(a, b)
 }

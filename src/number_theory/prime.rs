@@ -1,6 +1,7 @@
 use crate::number_theory::find::gcd;
 
 // TODO: generify
+#[inline]
 pub fn wheel_factorization(mut num: i64) -> Vec<i64> {
     let mut primes = Vec::new();
     let wheel: [i64; 11] = [1, 2, 2, 4, 2, 4, 2, 4, 6, 2, 6];
@@ -20,6 +21,7 @@ pub fn wheel_factorization(mut num: i64) -> Vec<i64> {
 }
 
 // TODO: generify
+#[inline]
 pub fn is_prime(num: i64) -> bool {
     if num <= 3 && num > 1 {
         true
@@ -37,6 +39,7 @@ pub fn is_prime(num: i64) -> bool {
     }
 }
 
+#[inline]
 pub fn coprimes(modulo: i64) -> Vec<i64> {
     let mut coprimes = Vec::new();
     for i in 1..modulo {

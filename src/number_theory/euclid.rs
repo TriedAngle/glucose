@@ -5,7 +5,20 @@ use std::ops::Neg;
 
 // TODO impl EA
 
+#[inline]
+pub fn ea<T: Int + NumAssignOps>(mut a: T, mut b: T) -> T {
+    let mut tmp;
+    while b != T::zero() {
+        tmp = b;
+        b = a % b;
+        a = tmp;
+    }
+
+    a
+}
+
 /// input: a < b
+#[inline]
 pub fn eea<T: Int + NumAssignOps + Neg<Output = T>>(mut a: T, mut b: T) -> (T, T) {
     assert!(a < b);
     let mut ks = Vec::new();
@@ -29,6 +42,7 @@ pub fn eea<T: Int + NumAssignOps + Neg<Output = T>>(mut a: T, mut b: T) -> (T, T
     (s, t)
 }
 
+#[inline]
 pub fn eea_with_steps<T: Int + NumAssignOps + Neg<Output = T>>(
     mut a: T,
     mut b: T,
@@ -61,6 +75,7 @@ pub fn eea_with_steps<T: Int + NumAssignOps + Neg<Output = T>>(
     (abs, ks, sts)
 }
 
+#[inline]
 pub fn eea_as_dmat<T: Int + NumAssignOps + Neg<Output = T>>(a: T, b: T) -> DMatrix<T> {
     let (abs, mut ks, sts) = eea_with_steps(a, b);
     ks.push(-T::one());
@@ -73,11 +88,18 @@ pub fn eea_as_dmat<T: Int + NumAssignOps + Neg<Output = T>>(a: T, b: T) -> DMatr
 }
 
 #[cfg(test)]
-mod euclidean_algo_tests {
+mod euclid_tests {
     use super::*;
 
     #[test]
-    fn algo() {
+    fn ea_test() {
+        let (a, b) = (54, 24);
+        let result = ea(a, b);
+        assert_eq!(result, 6)
+    }
+
+    #[test]
+    fn eea_test() {
         let (a, b) = (935, 1491);
         let (s, t) = eea(a, b);
         assert_eq!(s, 716);
@@ -85,13 +107,13 @@ mod euclidean_algo_tests {
     }
 
     #[test]
-    fn algo_with_steps() {
+    fn eea_steps() {
         let (a, b) = (935, 1491);
         let (abs, ks, sts) = eea_with_steps(a, b);
     }
 
     #[test]
-    fn algo_matrix() {
+    fn eea_matrix() {
         let (a, b) = (935, 1491);
         let mat = eea_as_dmat(a, b);
     }

@@ -1,69 +1,10 @@
-use crate::num::int::Int;
-use crate::num::num::NumAssignOps;
+use crate::number_theory::prime::{coprimes, wheel_factorization};
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum GroupType {
     Additive,
     Multiplicative,
     MultiplicativeStar,
-}
-
-// TODO: generify
-pub fn wheel_factorization(mut num: i64) -> Vec<i64> {
-    let mut primes = Vec::new();
-    let wheel: [i64; 11] = [1, 2, 2, 4, 2, 4, 2, 4, 6, 2, 6];
-    let (mut f, mut w) = (2, 0);
-
-    while f * f <= num {
-        if num % f == 0 {
-            primes.push(f);
-            num /= f;
-        } else {
-            f += wheel[w];
-            w = if w == 10 { 3 } else { w + 1 };
-        }
-    }
-    primes.push(num);
-    primes
-}
-
-pub fn is_prime(num: i64) -> bool {
-    if num <= 3 && num > 1 {
-        true
-    } else if num % 2 == 0 || num % 3 == 0 {
-        false
-    } else {
-        let mut i = 5;
-        while i * i <= num {
-            if num % i == 0 || num % i + 2 == 0 {
-                return false;
-            }
-            i += 6;
-        }
-        true
-    }
-}
-
-pub fn gcd(a: i64, b: i64) -> i64 {
-    let mut i = 1;
-    let mut gcd = 1;
-    while i <= a && i <= b {
-        if a % i == 0 && b % i == 0 {
-            gcd = i;
-        }
-        i += 1;
-    }
-    return gcd;
-}
-
-pub fn coprimes(modulo: i64) -> Vec<i64> {
-    let mut coprimes = Vec::new();
-    for i in 1..modulo {
-        if gcd(i, modulo) == 1 {
-            coprimes.push(i);
-        }
-    }
-    coprimes
 }
 
 pub fn group_size(modulo: i64, kind: GroupType) -> i64 {
@@ -189,7 +130,9 @@ pub fn producers(modulo: i64, group: &[i64], kind: GroupType, big: bool) -> Vec<
         }
         GroupType::Multiplicative => {
             if big {
-                group.iter().filter(|num| is_producer_mul_2(modulo, **num, group_size))
+                group
+                    .iter()
+                    .filter(|num| is_producer_mul_2(modulo, **num, group_size))
                     .for_each(|num| producers.push(*num))
             } else {
                 let mut group_size_factors = wheel_factorization(group_size);
@@ -210,7 +153,9 @@ pub fn producers(modulo: i64, group: &[i64], kind: GroupType, big: bool) -> Vec<
         }
         GroupType::MultiplicativeStar => {
             if big {
-                group.iter().filter(|num| is_producer_mul(modulo, **num, group_size))
+                group
+                    .iter()
+                    .filter(|num| is_producer_mul(modulo, **num, group_size))
                     .for_each(|num| producers.push(*num))
             } else {
                 let mut group_size_factors = wheel_factorization(group_size);
@@ -262,6 +207,7 @@ fn is_producer_mul_2(modulo: i64, num: i64, group_size: i64) -> bool {
 }
 
 #[test]
+#[ignore]
 fn test() {
     let modulo = 17;
     let kind = GroupType::MultiplicativeStar;
@@ -281,17 +227,4 @@ fn test() {
     println!("possible orders: {:?}", possible_orders);
     println!("actual order: {:?}", orders);
     println!("producers: {:?}", producers);
-}
-
-#[test]
-fn test2() {
-    let modulo = 5;
-    let kind = GroupType::Multiplicative;
-    // // let prime_factorization = wheel_factorization(modulo);
-    // // let group_size = group_size(modulo, kind);
-    // // let group_size_factorization = wheel_factorization(group_size);
-    let group = group(modulo, kind);
-    // let possible_orders = possible_orders(modulo, kind);
-    let orders = orders(modulo, &group, kind);
-    let producers = producers(modulo, &group, kind, false);
 }

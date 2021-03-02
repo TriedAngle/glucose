@@ -1,5 +1,5 @@
-use crate::linear::scalar::Scalar;
-use crate::linear::vec::Vector;
+use crate::algebra::linear::scalar::Scalar;
+use crate::algebra::linear::vec::Vector;
 use std::alloc::Layout;
 use std::fmt::{Display, Formatter};
 use std::ops::{Add, Div, DivAssign, Mul, MulAssign, Sub};

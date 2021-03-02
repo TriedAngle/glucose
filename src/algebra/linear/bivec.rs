@@ -1,4 +1,4 @@
-use crate::linear::scalar::Scalar;
+use crate::algebra::linear::scalar::Scalar;
 use crate::numeric::float::Float;
 use crate::numeric::identity::{One, Zero};
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};

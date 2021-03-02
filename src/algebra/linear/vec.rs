@@ -1,9 +1,8 @@
-use crate::linear::mat::Matrix;
-use crate::linear::scalar::{Scalar, Two};
+use crate::algebra::linear::mat::Matrix;
+use crate::algebra::linear::scalar::{Scalar, Two};
 use crate::numeric::cmp::Cmp;
 use crate::numeric::float::Float;
 use crate::numeric::sign::Signed;
-use paste::paste;
 use std::fmt::{Display, Formatter};
 use std::iter::Sum;
 use std::ops::{Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, Sub, SubAssign};
@@ -73,7 +72,7 @@ impl<T, const N: usize> Vector<T, { N }> {
     }
 
     #[inline]
-    pub fn as_mut_ptr(&mut self) -> *mut T {
+    pub fn as_ptr_mut(&mut self) -> *mut T {
         self as *mut Self as *mut T
     }
 
@@ -493,7 +492,6 @@ macro_rules! letters_for_vectors {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::time::Instant;
 
     #[test]
     fn create_numeric_vectors() {

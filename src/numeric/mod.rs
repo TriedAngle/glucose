@@ -1,6 +1,3 @@
-#[macro_use]
-mod util;
-
 pub mod bit;
 pub mod cmp;
 pub mod float;

@@ -1,19 +1,21 @@
 #![allow(unused)]
+#![deny(unused_imports)]
 
-mod impls;
-mod linear;
+#[cfg(feature = "linear")]
+pub use algebra::linear;
 
+#[cfg(feature = "specialized")]
+pub use specialized::algebra::vec::*;
+
+pub mod algebra;
 pub mod group_theory;
+pub mod number_theory;
 pub mod numeric;
+pub mod specialized;
 
-pub use linear::bivec::Bivector2;
-pub use linear::dynamic::{DMatrix, DVector};
-pub use linear::mat::{Matrix, SquareMatrix};
-pub use linear::rotor::Rotor2;
-pub use linear::scalar::{Scalar, Two};
-pub use linear::vec::{Point, Vector};
-pub use numeric as num;
-
+pub mod impls;
+#[macro_use]
+pub mod util;
 // this allows syntax like:
 // impl<T, const N: usize> Vector<T, { N }> where Assert::<N > 3>: IsTrue { }
 // TODO: wait for 76560 => restrict ops impls so manual impls can also use ops

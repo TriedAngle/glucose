@@ -1,15 +1,12 @@
-use crate::linear::dynamic::DMatrix;
-use crate::num::num::NumAssignOps;
+use crate::algebra::linear::dynamic::DMatrix;
 use crate::numeric::int::Int;
-use crate::Matrix;
-use std::fmt::Debug;
+use crate::numeric::num::NumAssignOps;
 use std::ops::Neg;
 
+// TODO impl EA
+
 /// input: a < b
-pub fn extended_euclidean_algorithm<T: Int + NumAssignOps + Neg<Output = T>>(
-    mut a: T,
-    mut b: T,
-) -> (T, T) {
+pub fn eea<T: Int + NumAssignOps + Neg<Output = T>>(mut a: T, mut b: T) -> (T, T) {
     assert!(a < b);
     let mut ks = Vec::new();
     let mut k = T::zero();
@@ -32,7 +29,7 @@ pub fn extended_euclidean_algorithm<T: Int + NumAssignOps + Neg<Output = T>>(
     (s, t)
 }
 
-pub fn extended_euclidean_algorithm_with_steps<T: Int + NumAssignOps + Neg<Output = T>>(
+pub fn eea_with_steps<T: Int + NumAssignOps + Neg<Output = T>>(
     mut a: T,
     mut b: T,
 ) -> (Vec<(T, T)>, Vec<T>, Vec<(T, T)>) {
@@ -64,11 +61,8 @@ pub fn extended_euclidean_algorithm_with_steps<T: Int + NumAssignOps + Neg<Outpu
     (abs, ks, sts)
 }
 
-pub fn extended_euclidean_as_dmatrix<T: Int + NumAssignOps + Neg<Output = T>>(
-    a: T,
-    b: T,
-) -> DMatrix<T> {
-    let (abs, mut ks, sts) = extended_euclidean_algorithm_with_steps(a, b);
+pub fn eea_as_dmat<T: Int + NumAssignOps + Neg<Output = T>>(a: T, b: T) -> DMatrix<T> {
+    let (abs, mut ks, sts) = eea_with_steps(a, b);
     ks.push(-T::one());
     let a_vec = abs.iter().map(|(a, b)| *a).collect();
     let b_vec = abs.iter().map(|(a, b)| *b).collect();
@@ -85,7 +79,7 @@ mod euclidean_algo_tests {
     #[test]
     fn algo() {
         let (a, b) = (935, 1491);
-        let (s, t) = extended_euclidean_algorithm(a, b);
+        let (s, t) = eea(a, b);
         assert_eq!(s, 716);
         assert_eq!(t, -449);
     }
@@ -93,12 +87,12 @@ mod euclidean_algo_tests {
     #[test]
     fn algo_with_steps() {
         let (a, b) = (935, 1491);
-        let (abs, ks, sts) = extended_euclidean_algorithm_with_steps(a, b);
+        let (abs, ks, sts) = eea_with_steps(a, b);
     }
 
     #[test]
     fn algo_matrix() {
         let (a, b) = (935, 1491);
-        let mat = extended_euclidean_as_dmatrix(a, b);
+        let mat = eea_as_dmat(a, b);
     }
 }

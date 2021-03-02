@@ -1,7 +1,5 @@
 use crate::numeric::identity::{One, Zero};
-use std::ops::{
-    Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, RemAssign, Sub, SubAssign,
-};
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Rem, RemAssign, Sub, SubAssign};
 
 pub trait Num: PartialEq + Zero + One + NumOps {}
 

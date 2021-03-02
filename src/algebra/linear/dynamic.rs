@@ -1,4 +1,4 @@
-use crate::{Scalar, Vector};
+use crate::algebra::linear::scalar::Scalar;
 use std::fmt::{Debug, Display, Formatter};
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 use std::str::FromStr;
@@ -391,8 +391,8 @@ impl<T: FromStr + Default> From<&str> for DMatrix<T> {
 
 #[cfg(test)]
 mod dynamic_mat_tests {
-    use crate::linear::dynamic::DMatrix;
-    use crate::DVector;
+    use crate::algebra::linear::dynamic::DMatrix;
+    use crate::algebra::linear::dynamic::DVector;
 
     #[test]
     fn add() {

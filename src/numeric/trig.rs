@@ -1,3 +1,4 @@
+use crate::forward;
 use crate::numeric::num::Num;
 
 pub trait Trig: Sized + Num {

@@ -15,6 +15,8 @@
 #### Notes: 
 * Rust 1.51 (nightly only right now) and onwards is required
 
+* For planned and current features see TODO.md
+
 * Why didn't you use crate X instead of writing Y yourself?  
   Because I decided not to ;)
 

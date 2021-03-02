@@ -20,7 +20,7 @@ default = ["linear"]
 full = ["linear-full", "theory", "serde", "bytemuck"]
 linear-full = ["linear", "specialized"]
 linear = []
-specialized = []
+specialized = ["linear"]
 theory = []
 
 [dependencies]

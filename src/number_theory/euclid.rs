@@ -3,8 +3,6 @@ use crate::numeric::int::Int;
 use crate::numeric::num::NumAssignOps;
 use std::ops::Neg;
 
-// TODO impl EA
-
 #[inline]
 pub fn ea<T: Int + NumAssignOps>(mut a: T, mut b: T) -> T {
     let mut tmp;

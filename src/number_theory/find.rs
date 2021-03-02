@@ -1,7 +1,6 @@
 use crate::number_theory::euclid::ea;
 
 // TODO: generify
-// TODO: use EA for this
 #[inline]
 pub fn gcd(a: i64, b: i64) -> i64 {
     ea(a, b)

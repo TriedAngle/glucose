@@ -1,6 +1,7 @@
 use crate::algebra::linear::scalar::Scalar;
 use crate::algebra::linear::vec::Vector;
 use crate::forward;
+use crate::numeric::float::Float;
 use std::fmt::{Debug, Formatter};
 use std::ops::{Add, AddAssign, Div, Index, IndexMut, Mul, MulAssign, Sub, SubAssign};
 
@@ -47,6 +48,31 @@ macro_rules! specialize_vec {
                     $inner => fn as_array_mut(&mut self) -> &mut [T; $dim];
                     $inner => fn as_ptr_mut(&mut self) -> *mut T;
                     $inner => fn as_slice_mut(&mut self) -> &mut [T];
+                }
+            }
+
+            impl<T: Scalar + Float> $name<T> {
+                #[inline]
+                pub fn magnitude_squared(&self) -> T {
+                    $(self.inner.data[$index] +)* T::zero()
+                }
+
+                #[inline]
+                pub fn magnitude(&self) -> T {
+                    self.magnitude_squared().sqrt()
+                }
+
+                #[inline]
+                pub fn normalize(&mut self) {
+                    let magnitude = self.magnitude();
+                    $(self.inner.data[$index] /= magnitude;)*
+                }
+
+                #[inline]
+                pub fn normalized(&self) -> Self {
+                    let mut vec = *self;
+                    vec.normalize();
+                    vec
                 }
             }
 
@@ -251,17 +277,19 @@ mod specialized_vec_tests {
 
         let start_n = Instant::now();
         for _ in 0..10000000 {
-            vec_n = vec_n + vec_n_adder;
+            // vec_n = vec_n + vec_n_adder;
+            vec_n.normalized();
         }
         let stop_n = start_n.elapsed();
 
         let start_4 = Instant::now();
         for _ in 0..10000000 {
-            vec_4 = vec_4 + vec_4_adder;
+            // vec_4 = vec_4 + vec_4_adder;
+            vec_4.normalized();
         }
         let stop_4 = start_4.elapsed();
 
-        println!("Vector<f64, 4> took: {}", stop_n.as_secs_f32());
-        println!("Vec4<f64> took: {}", stop_4.as_secs_f32());
+        println!("Vector<f64, 4> took: {}", stop_n.as_secs_f64());
+        println!("Vec4<f64> took: {}", stop_4.as_secs_f64());
     }
 }

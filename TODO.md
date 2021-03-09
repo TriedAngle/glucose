@@ -8,6 +8,8 @@
 - [x] Dynamic Vectors
 - [x] Dynamic Matrices
 - [X] basic "specialisation" (>1000x performance boost) by wrapper types for N < 9
+- [x] correct algebraic structure traits (fructose library)
+- [ ] migrate glucose to fructose
 - [ ] 2D Bivector (partially implement already)
 - [ ] 3D Bivector
 - [ ] 2D Rotor (partially implement already)
@@ -16,7 +18,6 @@
 - [ ] Quaternions
 - [ ] Matrix Determinant
 - [ ] LU Decomposition
-- [ ] correct algebraic structure traits
 
 # Number Theory
 - [x] prime factorization
@@ -27,25 +28,37 @@
 - [ ] Stirling numbers of the second kind
 - [ ] DPLL
 - [ ] Linear Resolution
+- [ ] generify everything
 
-## Abstract over Types
+# Abstract over Types
 - [x] Basic Numeric Traits
 - [x] Trigonometry Trait 
 - [x] Power Trait
-- [ ] Real Number Trait
-- [ ] Complex Numbers
-- [ ] correct number theory rewrite of the numeric traits
+- [ ] Add Complex Number
+- [ ] impl ComplexField for Real and Complex Numbers
 
 # Group Theory
+- [ ] migrate current algos and types to fructose
 - [x] Types (Additive, Multiplicative, Multiplicative with Modulo)
 - [x] group size
 - [x] whole group
 - [x] orders (multiplicative none modulo needs a fix)
 - [x] producers (algorithm needs a fix for numbers bigger 54)
-- [ ] cyclic groups
+- [ ] cyclic groups with fructose
 - [ ] control elements
 
-# Bioinformatics
+# Calculus
+- [ ] some more traits
+- [ ] implement functions with fructose traits
+- [ ] integrals and derivatives
+- [ ] solvers
+
+# Statistics (requires calculus)
+- [ ] Traits
+- [ ] Types
+
+# Bioinformatics (requires statistics)
+- [ ] Types e.g. Alphabets etc.
 - [ ] Derivative of Boyer-Moore
 - [ ] Derivative of KMP
 
@@ -62,7 +75,6 @@
 - [ ] mint
 
 # Future (until the end of the year)
-- [ ] Statistics
 - [ ] Tools for Bioinformatics (maybe in a separate crate?)
 - [ ] SIMD optimizations
 - [ ] BLAS

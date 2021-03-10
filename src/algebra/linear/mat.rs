@@ -1,5 +1,6 @@
 use crate::algebra::linear::scalar::Scalar;
 use crate::numeric::cmp::Cmp;
+use crate::numeric::mul_add::MulAdd;
 use crate::numeric::sign::Signed;
 use std::alloc::Layout;
 use std::fmt::{Display, Formatter};
@@ -214,6 +215,18 @@ impl<T: Scalar + Cmp, const M: usize, const N: usize> Matrix<T, { M }, { N }> {
             }
         }
         mat
+    }
+}
+
+impl<T: Scalar, const M: usize> SquareMatrix<T, { M }> {
+    #[inline]
+    pub fn determinant(&self) -> T {
+        match M {
+            0 => T::one(),
+            1 => self[[0, 0]],
+            2 => self[[0, 0]] * self[[1, 1]] - self[[1, 0]] * self[[1, 0]],
+            _ => {}
+        }
     }
 }
 

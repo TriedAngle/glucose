@@ -4,14 +4,10 @@
 #[cfg(feature = "linear")]
 pub use algebra::linear;
 
-#[cfg(feature = "specialized")]
-pub use specialized::algebra::vec::*;
-
 pub mod algebra;
 pub mod group_theory;
 pub mod number_theory;
 pub mod numeric;
-pub mod specialized;
 
 pub mod impls;
 #[macro_use]

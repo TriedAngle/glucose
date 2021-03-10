@@ -6,4 +6,5 @@ pub mod mat;
 pub mod prelude;
 pub mod rotor;
 pub mod scalar;
+pub mod storage;
 pub mod vec;

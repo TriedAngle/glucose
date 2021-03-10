@@ -54,6 +54,11 @@ impl<T, const M: usize, const N: usize> Matrix<T, { M }, { N }> {
     }
 
     #[inline]
+    pub const fn size(&self) -> (usize, usize) {
+        (M, N)
+    }
+
+    #[inline]
     pub fn layout() -> Layout {
         Layout::from_size_align(std::mem::size_of::<Self>(), std::mem::align_of::<[T; M]>())
             .unwrap()
@@ -243,7 +248,9 @@ impl<T: Scalar, const M: usize> SquareMatrix<T, { M }> {
 
                 e11 * minor_1 - e12 * minor_2 + e13 * minor_3
             }
-            _ => { unimplemented!() }
+            _ => {
+                unimplemented!("TODO: Add LU Decomposition")
+            }
         }
     }
 }

@@ -148,10 +148,43 @@ impl<T: Scalar, const N: usize> Vector<T, { N }> {
     }
 }
 
-impl<T: Scalar + Float + Sum, const N: usize> Vector<T, { N }> {
+impl<T: Scalar + Float + Sum + Copy, const N: usize> Vector<T, { N }> {
     #[inline]
     pub fn magnitude_squared(&self) -> T {
-        self.data.iter().map(|e| *e * *e).sum()
+        match N {
+            2 => self.data[0] + self.data[1],
+            3 => self.data[0] + self.data[1] + self.data[2],
+            4 => self.data[0] + self.data[1] + self.data[2] + self.data[3],
+            5 => self.data[0] + self.data[1] + self.data[2] + self.data[3] + self.data[4],
+            6 => {
+                self.data[0]
+                    + self.data[1]
+                    + self.data[2]
+                    + self.data[3]
+                    + self.data[4]
+                    + self.data[5]
+            }
+            7 => {
+                self.data[0]
+                    + self.data[1]
+                    + self.data[2]
+                    + self.data[3]
+                    + self.data[4]
+                    + self.data[5]
+                    + self.data[6]
+            }
+            8 => {
+                self.data[0]
+                    + self.data[1]
+                    + self.data[2]
+                    + self.data[3]
+                    + self.data[4]
+                    + self.data[5]
+                    + self.data[6]
+                    + self.data[7]
+            }
+            _ => self.data.iter().map(|e| *e * *e).sum(),
+        }
     }
 
     #[inline]
@@ -162,7 +195,58 @@ impl<T: Scalar + Float + Sum, const N: usize> Vector<T, { N }> {
     #[inline]
     pub fn normalize(&mut self) {
         let magnitude = self.magnitude();
-        self.data.iter_mut().for_each(|e| *e /= magnitude);
+        match N {
+            2 => {
+                self.data[0] /= magnitude;
+                self.data[1] /= magnitude;
+            }
+            3 => {
+                self.data[0] /= magnitude;
+                self.data[1] /= magnitude;
+                self.data[2] /= magnitude;
+            }
+            4 => {
+                self.data[0] /= magnitude;
+                self.data[1] /= magnitude;
+                self.data[2] /= magnitude;
+                self.data[3] /= magnitude;
+            }
+            5 => {
+                self.data[0] /= magnitude;
+                self.data[1] /= magnitude;
+                self.data[2] /= magnitude;
+                self.data[3] /= magnitude;
+                self.data[4] /= magnitude;
+            }
+            6 => {
+                self.data[0] /= magnitude;
+                self.data[1] /= magnitude;
+                self.data[2] /= magnitude;
+                self.data[3] /= magnitude;
+                self.data[4] /= magnitude;
+                self.data[5] /= magnitude;
+            }
+            7 => {
+                self.data[0] /= magnitude;
+                self.data[1] /= magnitude;
+                self.data[2] /= magnitude;
+                self.data[3] /= magnitude;
+                self.data[4] /= magnitude;
+                self.data[5] /= magnitude;
+                self.data[6] /= magnitude;
+            }
+            8 => {
+                self.data[0] /= magnitude;
+                self.data[1] /= magnitude;
+                self.data[2] /= magnitude;
+                self.data[3] /= magnitude;
+                self.data[4] /= magnitude;
+                self.data[5] /= magnitude;
+                self.data[6] /= magnitude;
+                self.data[7] /= magnitude;
+            }
+            _ => self.data.iter_mut().for_each(|e| *e /= magnitude),
+        }
     }
 
     #[inline]
@@ -269,11 +353,11 @@ impl<T: Scalar, const N: usize> Add for Vector<T, { N }> {
     type Output = Self;
     #[inline]
     fn add(self, rhs: Self) -> Self::Output {
-        let mut data = [<T>::default(); N];
+        let mut data = Self::default();
         for i in 0..N {
             data[i] = self[i] + rhs[i];
         }
-        Self { data }
+        data
     }
 }
 

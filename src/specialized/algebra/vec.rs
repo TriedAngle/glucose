@@ -276,16 +276,16 @@ mod specialized_vec_tests {
         let mut vec_4: Vec8<f64> = Vec8::zero();
 
         let start_n = Instant::now();
-        for _ in 0..10000000 {
+        for _ in 0..100000000 {
             // vec_n = vec_n + vec_n_adder;
-            vec_n.normalized();
+            vec_n.add(vec_n_adder);
         }
         let stop_n = start_n.elapsed();
 
         let start_4 = Instant::now();
-        for _ in 0..10000000 {
+        for _ in 0..100000000 {
             // vec_4 = vec_4 + vec_4_adder;
-            vec_4.normalized();
+            vec_4.add(vec_4_adder);
         }
         let stop_4 = start_4.elapsed();
 

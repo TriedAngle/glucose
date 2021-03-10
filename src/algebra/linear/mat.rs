@@ -224,6 +224,15 @@ impl<T: Scalar + Cmp, const M: usize, const N: usize> Matrix<T, { M }, { N }> {
 
 impl<T: Scalar, const M: usize> SquareMatrix<T, { M }> {
     #[inline]
+    pub fn identity() -> Self {
+        let mut mat = Self::zero();
+        for m in 0..M {
+            mat[[m, m]] = T::one();
+        }
+        mat
+    }
+
+    #[inline]
     pub fn determinant(&self) -> T {
         match M {
             0 => T::one(),

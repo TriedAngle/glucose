@@ -2,6 +2,7 @@ use crate::algebra::linear::mat::Matrix;
 use crate::algebra::linear::scalar::{Scalar, Two};
 use crate::numeric::float::Float;
 use std::iter::Sum;
+use std::ops::{Index, IndexMut};
 
 pub type Point<T, const N: usize> = Vector<T, { N }>;
 
@@ -21,7 +22,7 @@ impl<T: Scalar, const N: usize> Vector<T, { N }> {
     pub fn dot(&self, other: Self) -> T {
         let mut sum = <T>::default();
         for i in 0..N {
-            sum += self[[0, i]] * other[[0, i]];
+            sum += self[i] * other[i];
         }
         sum
     }
@@ -39,47 +40,17 @@ impl<T: Scalar, const N: usize> Vector<T, { N }> {
     }
 }
 
-impl<T: Scalar + Float + Sum + Copy, const N: usize> Vector<T, { N }> {
+impl<T: Scalar + Float + Sum, const N: usize> Vector<T, { N }> {
     #[inline]
     pub fn magnitude_squared(&self) -> T {
         match N {
-            2 => self.data[0][0] + self.data[0][1],
-            3 => self.data[0][0] + self.data[0][1] + self.data[0][2],
-            4 => self.data[0][0] + self.data[0][1] + self.data[0][2] + self.data[0][3],
-            5 => {
-                self.data[0][0]
-                    + self.data[0][1]
-                    + self.data[0][2]
-                    + self.data[0][3]
-                    + self.data[0][4]
-            }
-            6 => {
-                self.data[0][0]
-                    + self.data[0][1]
-                    + self.data[0][2]
-                    + self.data[0][3]
-                    + self.data[0][4]
-                    + self.data[0][5]
-            }
-            7 => {
-                self.data[0][0]
-                    + self.data[0][1]
-                    + self.data[0][2]
-                    + self.data[0][3]
-                    + self.data[0][4]
-                    + self.data[0][5]
-                    + self.data[0][6]
-            }
-            8 => {
-                self.data[0][0]
-                    + self.data[0][1]
-                    + self.data[0][2]
-                    + self.data[0][3]
-                    + self.data[0][4]
-                    + self.data[0][5]
-                    + self.data[0][6]
-                    + self.data[0][7]
-            }
+            2 => self[0] + self[1],
+            3 => self[0] + self[1] + self[2],
+            4 => self[0] + self[1] + self[2] + self[3],
+            5 => self[0] + self[1] + self[2] + self[3] + self[4],
+            6 => self[0] + self[1] + self[2] + self[3] + self[4] + self[5],
+            7 => self[0] + self[1] + self[2] + self[3] + self[4] + self[5] + self[6],
+            8 => self[0] + self[1] + self[2] + self[3] + self[4] + self[5] + self[6] + self[7],
             _ => self.data[0].iter().map(|e| *e * *e).sum(),
         }
     }
@@ -94,53 +65,53 @@ impl<T: Scalar + Float + Sum + Copy, const N: usize> Vector<T, { N }> {
         let magnitude = self.magnitude();
         match N {
             2 => {
-                self.data[0][0] /= magnitude;
-                self.data[0][1] /= magnitude;
+                self[0] /= magnitude;
+                self[1] /= magnitude;
             }
             3 => {
-                self.data[0][0] /= magnitude;
-                self.data[0][1] /= magnitude;
-                self.data[0][2] /= magnitude;
+                self[0] /= magnitude;
+                self[1] /= magnitude;
+                self[2] /= magnitude;
             }
             4 => {
-                self.data[0][0] /= magnitude;
-                self.data[0][1] /= magnitude;
-                self.data[0][2] /= magnitude;
-                self.data[0][3] /= magnitude;
+                self[0] /= magnitude;
+                self[1] /= magnitude;
+                self[2] /= magnitude;
+                self[3] /= magnitude;
             }
             5 => {
-                self.data[0][0] /= magnitude;
-                self.data[0][1] /= magnitude;
-                self.data[0][2] /= magnitude;
-                self.data[0][3] /= magnitude;
-                self.data[0][4] /= magnitude;
+                self[0] /= magnitude;
+                self[1] /= magnitude;
+                self[2] /= magnitude;
+                self[3] /= magnitude;
+                self[4] /= magnitude;
             }
             6 => {
-                self.data[0][0] /= magnitude;
-                self.data[0][1] /= magnitude;
-                self.data[0][2] /= magnitude;
-                self.data[0][3] /= magnitude;
-                self.data[0][4] /= magnitude;
-                self.data[0][5] /= magnitude;
+                self[0] /= magnitude;
+                self[1] /= magnitude;
+                self[2] /= magnitude;
+                self[3] /= magnitude;
+                self[4] /= magnitude;
+                self[5] /= magnitude;
             }
             7 => {
-                self.data[0][0] /= magnitude;
-                self.data[0][1] /= magnitude;
-                self.data[0][2] /= magnitude;
-                self.data[0][3] /= magnitude;
-                self.data[0][4] /= magnitude;
-                self.data[0][5] /= magnitude;
-                self.data[0][6] /= magnitude;
+                self[0] /= magnitude;
+                self[1] /= magnitude;
+                self[2] /= magnitude;
+                self[3] /= magnitude;
+                self[4] /= magnitude;
+                self[5] /= magnitude;
+                self[6] /= magnitude;
             }
             8 => {
-                self.data[0][0] /= magnitude;
-                self.data[0][1] /= magnitude;
-                self.data[0][2] /= magnitude;
-                self.data[0][3] /= magnitude;
-                self.data[0][4] /= magnitude;
-                self.data[0][5] /= magnitude;
-                self.data[0][6] /= magnitude;
-                self.data[0][7] /= magnitude;
+                self[0] /= magnitude;
+                self[1] /= magnitude;
+                self[2] /= magnitude;
+                self[3] /= magnitude;
+                self[4] /= magnitude;
+                self[5] /= magnitude;
+                self[6] /= magnitude;
+                self[7] /= magnitude;
             }
             _ => self.data[0].iter_mut().for_each(|e| *e /= magnitude),
         }
@@ -182,6 +153,20 @@ impl<T> From<(T, T, T)> for Point<T, 3> {
 impl<T> From<(T, T, T, T)> for Point<T, 4> {
     fn from(rhs: (T, T, T, T)) -> Self {
         Point::new([[rhs.0, rhs.1, rhs.2, rhs.3]])
+    }
+}
+
+impl<T, const N: usize> Index<usize> for Vector<T, { N }> {
+    type Output = T;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.data[0][index]
+    }
+}
+
+impl<T, const N: usize> IndexMut<usize> for Vector<T, { N }> {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        &mut self.data[0][index]
     }
 }
 

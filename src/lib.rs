@@ -1,15 +1,14 @@
 #![allow(unused)]
 #![deny(unused_imports)]
 
-#[cfg(feature = "linear")]
 pub use algebra::linear;
 
 pub mod algebra;
-pub mod group_theory;
-pub mod number_theory;
-pub mod numeric;
+// pub mod group_theory;
+// pub mod number_theory;
+// pub mod numeric;
 
-pub mod impls;
+// pub mod impls;
 #[macro_use]
 pub mod util;
 // this allows syntax like:

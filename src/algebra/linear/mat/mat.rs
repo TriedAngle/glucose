@@ -1,10 +1,13 @@
-use std::alloc::Layout;
-use std::fmt::{Display, Formatter};
-use fructose::operators::{ClosedAdd, ClosedSub, ClosedMul, ClosedDiv, ClosedNeg};
 use crate::linear::scalar::Scalar;
-use std::ops::{Neg, Index, IndexMut, Add, AddAssign, Sub, SubAssign, Mul, MulAssign, Div, DivAssign};
 use fructose::algebra::helpers::sign::Signed;
 use fructose::algebra::lattice::Lattice;
+use fructose::operators::{ClosedAdd, ClosedDiv, ClosedMul, ClosedNeg, ClosedRem, ClosedSub};
+use std::alloc::Layout;
+use std::fmt::{Display, Formatter};
+use std::ops::{
+    Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, Neg, Rem, RemAssign, Sub,
+    SubAssign,
+};
 
 pub type SquareMatrix<T, const N: usize> = Matrix<T, { N }, { N }>;
 
@@ -174,7 +177,11 @@ impl<T: Scalar + Lattice, const M: usize, const N: usize> Matrix<T, { M }, { N }
     pub fn clamp(&mut self, min: Self, max: Self) {
         for j in 0..M {
             for i in 0..N {
-                self[[j, i]] = *self[[j, i]].partial_min(&min[[j, i]]).unwrap().partial_max(&max[[j, i]]).unwrap()
+                self[[j, i]] = *self[[j, i]]
+                    .partial_min(&min[[j, i]])
+                    .unwrap()
+                    .partial_max(&max[[j, i]])
+                    .unwrap()
             }
         }
     }
@@ -319,8 +326,8 @@ impl<T: Scalar + ClosedSub, const M: usize, const N: usize> SubAssign for Matrix
     }
 }
 
-impl<T: Scalar + ClosedMul + ClosedAdd, const M: usize, const N: usize, const P: usize> Mul<Matrix<T, { N }, { P }>>
-    for Matrix<T, { M }, { N }>
+impl<T: Scalar + ClosedMul + ClosedAdd, const M: usize, const N: usize, const P: usize>
+    Mul<Matrix<T, { N }, { P }>> for Matrix<T, { M }, { N }>
 {
     type Output = Matrix<T, { M }, { P }>;
     #[inline]
@@ -351,7 +358,9 @@ impl<T: Scalar + ClosedMul, const M: usize, const N: usize> Mul<T> for Matrix<T,
     }
 }
 
-impl<T: Scalar + ClosedMul, const M: usize, const N: usize> MulAssign<T> for Matrix<T, { M }, { N }> {
+impl<T: Scalar + ClosedMul, const M: usize, const N: usize> MulAssign<T>
+    for Matrix<T, { M }, { N }>
+{
     fn mul_assign(&mut self, rhs: T) {
         for m in 0..M {
             for n in 0..N {
@@ -375,7 +384,9 @@ impl<T: Scalar + ClosedDiv, const M: usize, const N: usize> Div<T> for Matrix<T,
     }
 }
 
-impl<T: Scalar + ClosedDiv, const M: usize, const N: usize> DivAssign<T> for Matrix<T, { M }, { N }> {
+impl<T: Scalar + ClosedDiv, const M: usize, const N: usize> DivAssign<T>
+    for Matrix<T, { M }, { N }>
+{
     fn div_assign(&mut self, rhs: T) {
         for m in 0..M {
             for n in 0..N {
@@ -399,9 +410,36 @@ impl<T: Scalar + ClosedNeg, const M: usize, const N: usize> Neg for Matrix<T, { 
     }
 }
 
-impl<T: Scalar , const M: usize, const N: usize> From<T> for Matrix<T, { M }, { N }> {
+impl<T: Scalar + ClosedRem, const M: usize, const N: usize> Rem<T> for Matrix<T, { M }, { N }> {
+    type Output = Self;
+
+    fn rem(self, rhs: T) -> Self::Output {
+        let mut mat = self;
+        for m in 0..M {
+            for n in 0..N {
+                mat[[m, n]] %= rhs;
+            }
+        }
+        mat
+    }
+}
+
+impl<T: Scalar + ClosedRem, const M: usize, const N: usize> RemAssign<T>
+    for Matrix<T, { M }, { N }>
+{
+    fn rem_assign(&mut self, rhs: T) {
+        for m in 0..M {
+            for n in 0..N {
+                self[[m, n]] %= rhs;
+            }
+        }
+    }
+}
+impl<T: Scalar, const M: usize, const N: usize> From<T> for Matrix<T, { M }, { N }> {
     fn from(val: T) -> Self {
-        Self { data: [[val; M]; N] }
+        Self {
+            data: [[val; M]; N],
+        }
     }
 }
 

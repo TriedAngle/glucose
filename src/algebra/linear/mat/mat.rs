@@ -8,6 +8,7 @@ use std::ops::{
     Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, Neg, Rem, RemAssign, Sub,
     SubAssign,
 };
+use std::str::FromStr;
 
 pub type SquareMatrix<T, const N: usize> = Matrix<T, { N }, { N }>;
 
@@ -34,10 +35,10 @@ impl<T: Display, const M: usize, const N: usize> Display for Matrix<T, { M }, { 
             &string.push_str("|");
             for n in 0..N {
                 if n == N - 1 {
-                    &string.push_str(&format!("{}", self[[n, m]]));
+                    &string.push_str(&format!("{}", self[[m, n]]));
                     break;
                 }
-                &string.push_str(&format!("{} ", self[[n, m]]));
+                &string.push_str(&format!("{} ", self[[m, n]]));
             }
             &string.push_str("|\n");
         }
@@ -265,13 +266,13 @@ impl<T, const M: usize, const N: usize> Index<[usize; 2]> for Matrix<T, { M }, {
     type Output = T;
 
     fn index(&self, index: [usize; 2]) -> &Self::Output {
-        &self.data[index[0]][index[1]]
+        &self.data[index[1]][index[0]]
     }
 }
 
 impl<T, const M: usize, const N: usize> IndexMut<[usize; 2]> for Matrix<T, { M }, { N }> {
     fn index_mut(&mut self, index: [usize; 2]) -> &mut Self::Output {
-        &mut self.data[index[0]][index[1]]
+        &mut self.data[index[1]][index[0]]
     }
 }
 
@@ -435,13 +436,6 @@ impl<T: Scalar + ClosedRem, const M: usize, const N: usize> RemAssign<T>
         }
     }
 }
-impl<T: Scalar, const M: usize, const N: usize> From<T> for Matrix<T, { M }, { N }> {
-    fn from(val: T) -> Self {
-        Self {
-            data: [[val; M]; N],
-        }
-    }
-}
 
 impl<T: Default + Copy, const M: usize, const N: usize> Matrix<T, { M }, { N }> {
     #[inline]
@@ -450,4 +444,46 @@ impl<T: Default + Copy, const M: usize, const N: usize> Matrix<T, { M }, { N }> 
         let new: Matrix<T, { M }, { N }> = unsafe { *pointer.cast() };
         new
     }
+}
+
+impl<T: FromStr + Default + Copy, const M: usize, const N: usize> From<String> for Matrix<T, { M }, { N }> {
+    fn from(rhs: String) -> Self {
+        let mut mat = Matrix::default();
+
+        rhs.split(";")
+            .into_iter()
+            .enumerate()
+            .for_each(|(n, col)|
+                col.split(" ")
+                    .into_iter()
+                    .enumerate()
+                    .for_each(|(m, val)|
+                        mat[[m, n]] = val
+                            .to_string()
+                            .parse()
+                            .unwrap_or_else(|t|
+                                T::default()
+                            )
+                    )
+            );
+
+        mat
+    }
+}
+
+#[cfg(test)]
+mod mat_tests {
+    use super::*;
+    use crate::linear::vec::Vector;
+
+    #[test]
+    fn parse() {
+        let vec_string = String::from("2 3 -5");
+        let mat_string = String::from("2 3;-1 4;0 -2");
+        let vec = Vector::<i32, 3>::from(vec_string);
+        let mat = Matrix::<i32, 2, 3>::from(mat_string);
+        assert_eq!(vec, Vector::new([[2, 3, -5]]));
+        assert_eq!(mat, Matrix::new([[2, 3], [-1, 4], [0, -2]]));
+    }
+
 }

@@ -40,7 +40,7 @@ impl<T: Scalar + ClosedAdd + Identity<Additive> + PartialEq, const M: usize, con
     Identity<Additive> for Matrix<T, { M }, { N }>
 {
     fn identity() -> Self {
-        Self::from(T::identity())
+        Self::broadcast(T::identity())
     }
 
     fn is_identity(&self) -> bool {
@@ -87,7 +87,7 @@ impl<T: Scalar + ClosedAdd + ClosedMul + Identity<Multiplicative> + PartialEq, c
     Identity<Multiplicative> for SquareMatrix<T, { N }>
 {
     fn identity() -> Self {
-        Self::from(T::identity())
+        Self::broadcast(T::identity())
     }
 
     fn is_identity(&self) -> bool {

@@ -2,6 +2,7 @@ use crate::algebra::linear::scalar::Scalar;
 use std::fmt::{Debug, Display, Formatter};
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 use std::str::FromStr;
+use fructose::operators::{ClosedAdd, ClosedSub, ClosedMul, ClosedDiv};
 
 #[derive(Debug, Clone)]
 pub struct DVector<T> {
@@ -23,7 +24,7 @@ impl<T: Default + Copy> DVector<T> {
     }
 }
 
-impl<T: Scalar> DVector<T> {
+impl<T: Scalar + ClosedAdd + ClosedMul> DVector<T> {
     pub fn dot(&self, other: Self) -> T {
         let mut sum = T::default();
         for i in 0..self.len {
@@ -42,7 +43,7 @@ impl<T: Default + Copy> Default for DVector<T> {
     }
 }
 
-impl<T: Scalar> Add for DVector<T> {
+impl<T: Scalar + ClosedAdd> Add for DVector<T> {
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self::Output {
@@ -55,7 +56,7 @@ impl<T: Scalar> Add for DVector<T> {
     }
 }
 
-impl<T: Scalar> AddAssign for DVector<T> {
+impl<T: Scalar + ClosedAdd> AddAssign for DVector<T> {
     fn add_assign(&mut self, rhs: Self) {
         assert_eq!(self.len, rhs.len);
         for i in 0..self.len {
@@ -64,7 +65,7 @@ impl<T: Scalar> AddAssign for DVector<T> {
     }
 }
 
-impl<T: Scalar> Sub for DVector<T> {
+impl<T: Scalar + ClosedSub> Sub for DVector<T> {
     type Output = Self;
 
     fn sub(self, rhs: Self) -> Self::Output {
@@ -77,7 +78,7 @@ impl<T: Scalar> Sub for DVector<T> {
     }
 }
 
-impl<T: Scalar> SubAssign for DVector<T> {
+impl<T: Scalar + ClosedSub> SubAssign for DVector<T> {
     fn sub_assign(&mut self, rhs: Self) {
         assert_eq!(self.len, rhs.len);
         for i in 0..self.len {
@@ -145,7 +146,7 @@ impl<T: Default + Copy> DMatrix<T> {
     }
 }
 
-impl<T: Scalar> Add for DMatrix<T> {
+impl<T: Scalar + ClosedAdd> Add for DMatrix<T> {
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self::Output {
@@ -160,7 +161,7 @@ impl<T: Scalar> Add for DMatrix<T> {
     }
 }
 
-impl<T: Scalar> AddAssign for DMatrix<T> {
+impl<T: Scalar + ClosedAdd> AddAssign for DMatrix<T> {
     fn add_assign(&mut self, rhs: Self) {
         assert_eq!(self.size, rhs.size);
         for m in 0..self.size.0 {
@@ -171,7 +172,7 @@ impl<T: Scalar> AddAssign for DMatrix<T> {
     }
 }
 
-impl<T: Scalar> Sub for DMatrix<T> {
+impl<T: Scalar + ClosedSub> Sub for DMatrix<T> {
     type Output = Self;
 
     fn sub(self, rhs: Self) -> Self::Output {
@@ -186,7 +187,7 @@ impl<T: Scalar> Sub for DMatrix<T> {
     }
 }
 
-impl<T: Scalar> SubAssign for DMatrix<T> {
+impl<T: Scalar + ClosedSub> SubAssign for DMatrix<T> {
     fn sub_assign(&mut self, rhs: Self) {
         assert_eq!(self.size, rhs.size);
         for m in 0..self.size.0 {
@@ -197,7 +198,7 @@ impl<T: Scalar> SubAssign for DMatrix<T> {
     }
 }
 
-impl<T: Scalar> Mul for DMatrix<T> {
+impl<T: Scalar + ClosedAdd + ClosedMul> Mul for DMatrix<T> {
     type Output = Self;
 
     fn mul(self, rhs: Self) -> Self::Output {
@@ -214,7 +215,7 @@ impl<T: Scalar> Mul for DMatrix<T> {
     }
 }
 
-impl<T: Scalar> MulAssign for DMatrix<T> {
+impl<T: Scalar + ClosedMul> MulAssign for DMatrix<T> {
     fn mul_assign(&mut self, rhs: Self) {
         assert_eq!(self.size.0, rhs.size.1);
         for m in 0..self.size.0 {
@@ -249,7 +250,7 @@ impl<T: Default + Copy> From<DVector<T>> for DMatrix<T> {
     }
 }
 
-impl<T: Scalar> Mul<DVector<T>> for DMatrix<T> {
+impl<T: Scalar + ClosedAdd + ClosedMul> Mul<DVector<T>> for DMatrix<T> {
     type Output = DVector<T>;
 
     fn mul(self, rhs: DVector<T>) -> Self::Output {
@@ -257,7 +258,7 @@ impl<T: Scalar> Mul<DVector<T>> for DMatrix<T> {
     }
 }
 
-impl<T: Scalar> Mul<T> for DMatrix<T> {
+impl<T: Scalar + ClosedMul> Mul<T> for DMatrix<T> {
     type Output = Self;
 
     fn mul(self, rhs: T) -> Self::Output {
@@ -271,7 +272,7 @@ impl<T: Scalar> Mul<T> for DMatrix<T> {
     }
 }
 
-impl<T: Scalar> MulAssign<T> for DMatrix<T> {
+impl<T: Scalar + ClosedMul> MulAssign<T> for DMatrix<T> {
     fn mul_assign(&mut self, rhs: T) {
         for m in 0..self.size.0 {
             for n in 0..self.size.1 {
@@ -281,7 +282,7 @@ impl<T: Scalar> MulAssign<T> for DMatrix<T> {
     }
 }
 
-impl<T: Scalar> Div<T> for DMatrix<T> {
+impl<T: Scalar + ClosedDiv> Div<T> for DMatrix<T> {
     type Output = Self;
 
     fn div(self, rhs: T) -> Self::Output {
@@ -295,7 +296,7 @@ impl<T: Scalar> Div<T> for DMatrix<T> {
     }
 }
 
-impl<T: Scalar> DivAssign<T> for DMatrix<T> {
+impl<T: Scalar + ClosedDiv> DivAssign<T> for DMatrix<T> {
     fn div_assign(&mut self, rhs: T) {
         for m in 0..self.size.0 {
             for n in 0..self.size.1 {

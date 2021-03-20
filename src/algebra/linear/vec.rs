@@ -177,8 +177,7 @@ mod vec_tests {
         let p0 = Point::from([2, 2]);
         let p1 = Point::from([3, 2]);
         let sub = p0 - p1;
-        // let conv = Point { data: [[sub[[0, 0]] as f32, sub[[1, 0]] as f32]]};
-        let conv = sub.to_other_type::<f32>();
+        let conv = Point { data: [[sub[[0, 0]] as f32, sub[[1, 0]] as f32]]};
         let size = conv.norm() as i32;
         println!("{}", p0);
         println!("{}", p1);

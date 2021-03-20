@@ -1,7 +1,6 @@
 use crate::linear::scalar::Scalar;
 use fructose::algebra::helpers::sign::Signed;
 use fructose::algebra::lattice::Lattice;
-use fructose::cast::CastInts;
 use fructose::operators::{ClosedAdd, ClosedDiv, ClosedMul, ClosedNeg, ClosedRem, ClosedSub};
 use std::alloc::Layout;
 use std::fmt::{Display, Formatter};
@@ -437,22 +436,22 @@ impl<T: Scalar + ClosedRem, const M: usize, const N: usize> RemAssign<T>
     }
 }
 
-// this sadly doesnt work really
-// TODO: number conversion
-impl<T: Default + Copy, const M: usize, const N: usize> Matrix<T, { M }, { N }> {
-    #[inline]
-    pub fn to_other_type<U: Default + Copy + CastInts>(&self) -> Matrix<U, { M }, { N }> {
-        let mut mat = Matrix::default();
-
-        for m in 0..M {
-            for n in 0..N {
-                mat[[m, n]] = U::try_from(self[[m, n]]).unwrap_or_default()
-            }
-        }
-
-        mat
-    }
-}
+// // this sadly doesnt work really
+// // TODO: number conversion
+// impl<T: Default + Copy, const M: usize, const N: usize> Matrix<T, { M }, { N }> {
+//     #[inline]
+//     pub fn to_other_type<U: Default + Copy + CastInts>(&self) -> Matrix<U, { M }, { N }> {
+//         let mut mat = Matrix::default();
+//
+//         for m in 0..M {
+//             for n in 0..N {
+//                 mat[[m, n]] = U::try_from(self[[m, n]]).unwrap_or_default()
+//             }
+//         }
+//
+//         mat
+//     }
+// }
 
 impl<T: FromStr + Default + Copy, const M: usize, const N: usize> From<String>
     for Matrix<T, { M }, { N }>

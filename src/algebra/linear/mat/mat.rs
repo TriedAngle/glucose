@@ -1,6 +1,7 @@
 use crate::linear::scalar::Scalar;
 use fructose::algebra::helpers::sign::Signed;
 use fructose::algebra::lattice::Lattice;
+use fructose::cast::CastInts;
 use fructose::operators::{ClosedAdd, ClosedDiv, ClosedMul, ClosedNeg, ClosedRem, ClosedSub};
 use std::alloc::Layout;
 use std::fmt::{Display, Formatter};
@@ -281,12 +282,11 @@ impl<T: Scalar + ClosedAdd, const M: usize, const N: usize> Add for Matrix<T, { 
     #[inline]
     fn add(self, rhs: Self) -> Self::Output {
         let mut mat = Matrix::default();
-        for i in 0..N {
-            for j in 0..M {
-                mat[[i, j]] = self[[i, j]] + rhs[[i, j]];
+        for m in 0..M {
+            for n in 0..N {
+                mat[[m, n]] = self[[m, n]] + rhs[[m, n]];
             }
         }
-
         mat
     }
 }
@@ -294,9 +294,9 @@ impl<T: Scalar + ClosedAdd, const M: usize, const N: usize> Add for Matrix<T, { 
 impl<T: Scalar + ClosedAdd, const M: usize, const N: usize> AddAssign for Matrix<T, { M }, { N }> {
     #[inline]
     fn add_assign(&mut self, rhs: Self) {
-        for i in 0..N {
-            for j in 0..M {
-                self[[i, j]] += rhs[[i, j]];
+        for m in 0..M {
+            for n in 0..N {
+                self[[m, n]] += rhs[[m, n]];
             }
         }
     }
@@ -307,9 +307,9 @@ impl<T: Scalar + ClosedSub, const M: usize, const N: usize> Sub for Matrix<T, { 
     #[inline]
     fn sub(self, rhs: Self) -> Self::Output {
         let mut mat = Matrix::default();
-        for i in 0..N {
-            for j in 0..M {
-                mat[[i, j]] = self[[i, j]] - rhs[[i, j]];
+        for m in 0..M {
+            for n in 0..N {
+                mat[[m, n]] = self[[m, n]] - rhs[[m, n]];
             }
         }
         mat
@@ -319,9 +319,9 @@ impl<T: Scalar + ClosedSub, const M: usize, const N: usize> Sub for Matrix<T, { 
 impl<T: Scalar + ClosedSub, const M: usize, const N: usize> SubAssign for Matrix<T, { M }, { N }> {
     #[inline]
     fn sub_assign(&mut self, rhs: Self) {
-        for i in 0..N {
-            for j in 0..M {
-                self[[i, j]] -= rhs[[i, j]];
+        for m in 0..M {
+            for n in 0..N {
+                self[[m, n]] -= rhs[[m, n]];
             }
         }
     }
@@ -337,7 +337,7 @@ impl<T: Scalar + ClosedMul + ClosedAdd, const M: usize, const N: usize, const P:
         for m in 0..M {
             for p in 0..P {
                 for n in 0..N {
-                    mat[[p, m]] += self[[n, m]] * rhs[[p, n]];
+                    mat[[m, p]] += self[[m, n]] * rhs[[n, p]];
                 }
             }
         }
@@ -437,35 +437,34 @@ impl<T: Scalar + ClosedRem, const M: usize, const N: usize> RemAssign<T>
     }
 }
 
+// this sadly doesnt work really
+// TODO: number conversion
 impl<T: Default + Copy, const M: usize, const N: usize> Matrix<T, { M }, { N }> {
     #[inline]
-    pub fn from_other_type<U: Default + Copy>(rhs: Matrix<U, { M }, { N }>) -> Self {
-        let pointer = &rhs as *const Matrix<U, { M }, { N }> as *const T;
-        let new: Matrix<T, { M }, { N }> = unsafe { *pointer.cast() };
-        new
+    pub fn to_other_type<U: Default + Copy + CastInts>(&self) -> Matrix<U, { M }, { N }> {
+        let mut mat = Matrix::default();
+
+        for m in 0..M {
+            for n in 0..N {
+                mat[[m, n]] = U::try_from(self[[m, n]]).unwrap_or_default()
+            }
+        }
+
+        mat
     }
 }
 
-impl<T: FromStr + Default + Copy, const M: usize, const N: usize> From<String> for Matrix<T, { M }, { N }> {
+impl<T: FromStr + Default + Copy, const M: usize, const N: usize> From<String>
+    for Matrix<T, { M }, { N }>
+{
     fn from(rhs: String) -> Self {
         let mut mat = Matrix::default();
 
-        rhs.split(";")
-            .into_iter()
-            .enumerate()
-            .for_each(|(n, col)|
-                col.split(" ")
-                    .into_iter()
-                    .enumerate()
-                    .for_each(|(m, val)|
-                        mat[[m, n]] = val
-                            .to_string()
-                            .parse()
-                            .unwrap_or_else(|t|
-                                T::default()
-                            )
-                    )
-            );
+        rhs.split(";").into_iter().enumerate().for_each(|(n, col)| {
+            col.split(" ").into_iter().enumerate().for_each(|(m, val)| {
+                mat[[m, n]] = val.to_string().parse().unwrap_or_else(|t| T::default())
+            })
+        });
 
         mat
     }
@@ -485,5 +484,4 @@ mod mat_tests {
         assert_eq!(vec, Vector::new([[2, 3, -5]]));
         assert_eq!(mat, Matrix::new([[2, 3], [-1, 4], [0, -2]]));
     }
-
 }

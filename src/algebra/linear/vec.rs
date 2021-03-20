@@ -166,3 +166,24 @@ impl<T, const N: usize> IndexMut<usize> for Vector<T, { N }> {
 //
 //     println!("{:?} took: {}", vec_n, stop_n.as_secs_f64());
 // }
+
+#[cfg(test)]
+mod vec_tests {
+    use crate::linear::vec::Point;
+    use fructose::algebra::linear::vector::NormedSpace;
+
+    #[test]
+    fn test() {
+        let p0 = Point::from([2, 2]);
+        let p1 = Point::from([3, 2]);
+        let sub = p0 - p1;
+        // let conv = Point { data: [[sub[[0, 0]] as f32, sub[[1, 0]] as f32]]};
+        let conv = sub.to_other_type::<f32>();
+        let size = conv.norm() as i32;
+        println!("{}", p0);
+        println!("{}", p1);
+        println!("{}", sub);
+        println!("{}", conv);
+        println!("{}", size)
+    }
+}

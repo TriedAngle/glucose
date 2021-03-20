@@ -1,8 +1,8 @@
 use crate::algebra::linear::scalar::Scalar;
+use fructose::operators::{ClosedAdd, ClosedDiv, ClosedMul, ClosedSub};
 use std::fmt::{Debug, Display, Formatter};
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 use std::str::FromStr;
-use fructose::operators::{ClosedAdd, ClosedSub, ClosedMul, ClosedDiv};
 
 #[derive(Debug, Clone)]
 pub struct DVector<T> {

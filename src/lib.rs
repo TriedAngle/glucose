@@ -1,5 +1,5 @@
 #![allow(unused)]
-#![deny(unused_imports)]
+// #![deny(unused_imports)]
 
 pub use algebra::linear;
 

@@ -26,7 +26,6 @@
   
 #### Credit
 This project is inspired by multiple other crates and I want to thank them:
-* num-traits
 * nalgebra
 * ultraviolet
 * ndarry

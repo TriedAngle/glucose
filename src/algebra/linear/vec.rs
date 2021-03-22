@@ -1,7 +1,6 @@
 use crate::algebra::linear::mat::Matrix;
-use crate::algebra::linear::scalar::{Scalar, Two};
-use crate::numeric::float::Float;
-use std::iter::Sum;
+use crate::algebra::linear::scalar::Scalar;
+use fructose::operators::{ClosedAdd, ClosedMul};
 use std::ops::{Index, IndexMut};
 
 pub type Point<T, const N: usize> = Vector<T, { N }>;
@@ -10,13 +9,13 @@ pub type Vector<T, const N: usize> = Matrix<T, { N }, 1>;
 
 pub type RowVector<T, const N: usize> = Matrix<T, 1, { N }>;
 
-impl<T: Scalar, const N: usize> Vector<T, { N }> {
-    #[inline]
-    pub fn unit(n: usize) -> Self {
-        let mut data = [<T>::default(); N];
-        data[n] = <T>::one();
-        Self { data: [data] }
-    }
+impl<T: Scalar + Copy + ClosedMul + ClosedAdd, const N: usize> Vector<T, { N }> {
+    // #[inline]
+    // pub fn unit(n: usize) -> Self {
+    //     let mut data = [<T>::default(); N];
+    //     data[n] = <T>::one();
+    //     Self { data: [data] }
+    // }
 
     #[inline]
     pub fn dot(&self, other: Self) -> T {
@@ -40,97 +39,12 @@ impl<T: Scalar, const N: usize> Vector<T, { N }> {
     }
 }
 
-impl<T: Scalar + Float + Sum, const N: usize> Vector<T, { N }> {
-    #[inline]
-    pub fn magnitude_squared(&self) -> T {
-        match N {
-            2 => self[0] + self[1],
-            3 => self[0] + self[1] + self[2],
-            4 => self[0] + self[1] + self[2] + self[3],
-            5 => self[0] + self[1] + self[2] + self[3] + self[4],
-            6 => self[0] + self[1] + self[2] + self[3] + self[4] + self[5],
-            7 => self[0] + self[1] + self[2] + self[3] + self[4] + self[5] + self[6],
-            8 => self[0] + self[1] + self[2] + self[3] + self[4] + self[5] + self[6] + self[7],
-            _ => self.data[0].iter().map(|e| *e * *e).sum(),
-        }
-    }
-
-    #[inline]
-    pub fn magnitude(&self) -> T {
-        self.magnitude_squared().sqrt()
-    }
-
-    #[inline]
-    pub fn normalize(&mut self) {
-        let magnitude = self.magnitude();
-        match N {
-            2 => {
-                self[0] /= magnitude;
-                self[1] /= magnitude;
-            }
-            3 => {
-                self[0] /= magnitude;
-                self[1] /= magnitude;
-                self[2] /= magnitude;
-            }
-            4 => {
-                self[0] /= magnitude;
-                self[1] /= magnitude;
-                self[2] /= magnitude;
-                self[3] /= magnitude;
-            }
-            5 => {
-                self[0] /= magnitude;
-                self[1] /= magnitude;
-                self[2] /= magnitude;
-                self[3] /= magnitude;
-                self[4] /= magnitude;
-            }
-            6 => {
-                self[0] /= magnitude;
-                self[1] /= magnitude;
-                self[2] /= magnitude;
-                self[3] /= magnitude;
-                self[4] /= magnitude;
-                self[5] /= magnitude;
-            }
-            7 => {
-                self[0] /= magnitude;
-                self[1] /= magnitude;
-                self[2] /= magnitude;
-                self[3] /= magnitude;
-                self[4] /= magnitude;
-                self[5] /= magnitude;
-                self[6] /= magnitude;
-            }
-            8 => {
-                self[0] /= magnitude;
-                self[1] /= magnitude;
-                self[2] /= magnitude;
-                self[3] /= magnitude;
-                self[4] /= magnitude;
-                self[5] /= magnitude;
-                self[6] /= magnitude;
-                self[7] /= magnitude;
-            }
-            _ => self.data[0].iter_mut().for_each(|e| *e /= magnitude),
-        }
-    }
-
-    #[inline]
-    pub fn normalized(&self) -> Self {
-        let mut vec = *self;
-        vec.normalize();
-        vec
-    }
-}
-
-impl<T: Scalar + Two, const N: usize> Vector<T, { N }> {
-    #[inline]
-    pub fn reflect(&mut self, normal: Self) {
-        *self -= normal * <T>::two() * self.dot(normal);
-    }
-}
+// impl<T: Scalar + Two, const N: usize> Vector<T, { N }> {
+//     #[inline]
+//     pub fn reflect(&mut self, normal: Self) {
+//         *self -= normal * <T>::two() * self.dot(normal);
+//     }
+// }
 
 impl<T, const N: usize> From<[T; N]> for Vector<T, { N }> {
     fn from(rhs: [T; N]) -> Self {
@@ -237,3 +151,40 @@ impl<T, const N: usize> IndexMut<usize> for Vector<T, { N }> {
 //     }
 // }
 //
+// #[test]
+// #[ignore]
+// fn speed() {
+//     use super::vec::Vector;
+//     use std::time::Instant;
+//     let mut vec_n = Vector::from([2.0, 3.0, -2.0, 1.0, 2.0, 3.0, 7.0, 8.0, 5.0, -2.0]);
+//
+//     let start_n = Instant::now();
+//     for _ in 0..1 {
+//         let x = vec_n.add(vec_n);
+//     }
+//     let stop_n = start_n.elapsed();
+//
+//     println!("{:?} took: {}", vec_n, stop_n.as_secs_f64());
+// }
+
+#[cfg(test)]
+mod vec_tests {
+    use crate::linear::vec::Point;
+    use fructose::algebra::linear::vector::NormedSpace;
+
+    #[test]
+    fn test() {
+        let p0 = Point::from([2, 2]);
+        let p1 = Point::from([3, 2]);
+        let sub = p0 - p1;
+        let conv = Point {
+            data: [[sub[[0, 0]] as f32, sub[[1, 0]] as f32]],
+        };
+        let size = conv.norm() as i32;
+        println!("{}", p0);
+        println!("{}", p1);
+        println!("{}", sub);
+        println!("{}", conv);
+        println!("{}", size)
+    }
+}

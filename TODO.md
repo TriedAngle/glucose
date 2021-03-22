@@ -34,7 +34,9 @@
 - [x] Basic Numeric Traits
 - [x] Trigonometry Trait 
 - [x] Power Trait
-- [ ] Add Complex Number
+- [ ] complex numbers
+- [ ] rational numbers
+- [x] impl ComplexField for Real
 - [ ] impl ComplexField for Real and Complex Numbers
 
 # Group Theory
@@ -44,8 +46,7 @@
 - [x] whole group
 - [x] orders (multiplicative none modulo needs a fix)
 - [x] producers (algorithm needs a fix for numbers bigger 54)
-- [ ] cyclic groups with fructose
-- [ ] control elements
+- [ ] cyclic groups with glucose
 
 # Calculus
 - [ ] some more traits

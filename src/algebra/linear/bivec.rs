@@ -1,6 +1,8 @@
 use crate::algebra::linear::scalar::Scalar;
 use fructose::algebra::helpers::identity::{One, Zero};
-use fructose::algebra::properties::general::{Identity, PartiallyOrdered, Set};
+use fructose::algebra::properties::general::{
+    Associative, Commutative, Identity, Invertible, PartiallyOrdered, Set, Total,
+};
 use fructose::operators::{
     Additive, ClosedAdd, ClosedDiv, ClosedMul, ClosedNeg, ClosedSub, Multiplicative,
 };
@@ -203,6 +205,24 @@ impl<T: Scalar + ClosedMul> Set<Multiplicative> for Bivector2<T> {
     }
 }
 
+impl<T: Scalar + ClosedAdd + Total<Additive>> Total<Additive> for Bivector2<T> {}
+
+impl<T: Scalar + ClosedAdd + Associative<Additive>> Associative<Additive> for Bivector2<T> {}
+
+impl<T: Scalar + ClosedAdd + Commutative<Additive>> Commutative<Additive> for Bivector2<T> {}
+
+impl<T: Scalar + ClosedMul + Total<Multiplicative>> Total<Multiplicative> for Bivector2<T> {}
+
+impl<T: Scalar + ClosedMul + Associative<Multiplicative>> Associative<Multiplicative>
+    for Bivector2<T>
+{
+}
+
+impl<T: Scalar + ClosedMul + Commutative<Multiplicative>> Commutative<Multiplicative>
+    for Bivector2<T>
+{
+}
+
 impl<T: Scalar + Identity<Additive> + ClosedAdd> Identity<Additive> for Bivector2<T> {
     fn identity() -> Self {
         Self::new(T::identity())
@@ -255,5 +275,27 @@ impl<T: Scalar + ClosedMul + Identity<Multiplicative> + PartiallyOrdered<Multipl
 
     fn is_one(&self) -> bool {
         *self == Self::one()
+    }
+}
+
+impl<T: Scalar + ClosedAdd + Invertible<Additive>> Invertible<Additive> for Bivector2<T> {
+    fn inverse(&self) -> Self {
+        -*self
+    }
+
+    fn inverted(&mut self) {
+        *self = -*self;
+    }
+}
+
+impl<T: Scalar + ClosedMul + Invertible<Multiplicative>> Invertible<Multiplicative>
+    for Bivector2<T>
+{
+    fn inverse(&self) -> Self {
+        unimplemented!()
+    }
+
+    fn inverted(&mut self) {
+        *self = -*self;
     }
 }

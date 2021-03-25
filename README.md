@@ -13,7 +13,7 @@
 
 
 #### Notes: 
-* Rust 1.51 (nightly only right now) and onwards is required
+* Rust 1.51 and onwards is required
 
 * For planned and current features see TODO.md
 

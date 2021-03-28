@@ -1,8 +1,13 @@
 use fructose::algebra::helpers::bound::Bounded;
+use fructose::algebra::helpers::list::{ListSet, WholeListSet};
 use fructose::algebra::properties::general::{Associative, Commutative, Identity, Set, Total};
 use fructose::operators::mul_add::ClosedMulAdd;
 use fructose::operators::{Additive, ClosedAdd, ClosedMul, ClosedRem, Multiplicative};
-use std::ops::{Add, AddAssign, Mul, MulAssign, Sub, SubAssign};
+
+use std::ops::{Add, AddAssign, Mul, MulAssign, Range, Sub, SubAssign};
+
+// TODO: add this to fructose
+// this method is not intended to be used for 32bit and above sets
 
 // Trait for Fixed Integers, mainly for ease of use
 pub trait FixedInteger:
@@ -100,6 +105,26 @@ macro_rules! impl_ops {
         impl<const MAX: usize> Set<Multiplicative> for FI<$set, { MAX }> {
             fn operate(&self, rhs: Self) -> Self { *self * rhs }
         }
+
+        impl<const MAX: usize> ListSet<$set> for FI<$set, { MAX }> {
+            fn list_set(range: Range<$set>) -> Vec<$set> {
+                let mut values = Vec::new();
+                for val in range {
+                    values.push(val);
+                }
+                values
+            }
+        }
+
+        impl<const MAX: usize> WholeListSet<$set> for FI<$set, { MAX }> {
+            fn whole_list_set() -> Vec<$set> {
+                let mut values = Vec::new();
+                for val in Self::MIN..(MAX as $set){
+                    values.push(val);
+                }
+                values
+            }
+        }
     };
     (@signed $set:ty) => {
         impl<const MAX: usize> Bounded<$set> for FI<$set, { MAX }> {
@@ -137,7 +162,9 @@ impl_ops!(i32: u32);
 #[cfg(test)]
 mod group_tests {
     use super::FI;
+    use crate::group_theory::groups::WholeListSet;
     use fructose::algebra::helpers::bound::Bounded;
+    use fructose::algebra::helpers::list::ListSet;
 
     #[test]
     fn signed() {
@@ -145,8 +172,12 @@ mod group_tests {
         let y = FI::<i32, 6>::new(4);
         let z = x + y;
         let w = x * y;
+        let a = x - y;
+        let b = y - x;
         assert_eq!(z.value(), 3);
         assert_eq!(w.value(), 2);
+        assert_eq!(a.value(), 1);
+        assert_eq!(b.value(), -1);
         assert_eq!(FI::<i32, 6>::MIN, -5);
         assert_eq!(FI::<i32, 6>::MAX, 5);
     }
@@ -161,6 +192,20 @@ mod group_tests {
         assert_eq!(w.value(), 2);
         assert_eq!(FI::<u32, 6>::MIN, 0);
         assert_eq!(FI::<u32, 6>::MAX, 5);
+    }
+
+    #[test]
+    fn range() {
+        let list_set_signed = FI::<i32, 5>::list_set((-2..4));
+        let whole_list_set_signed = FI::<i32, 5>::whole_list_set();
+
+        let list_set_unsigned = FI::<u32, 5>::list_set((1..3));
+        let whole_list_set_unsigned = FI::<u32, 5>::whole_list_set();
+
+        assert_eq!(list_set_signed, vec![-2, -1, 0, 1, 2, 3]);
+        assert_eq!(whole_list_set_signed, vec![-4, -3, -2, -1, 0, 1, 2, 3, 4]);
+        assert_eq!(list_set_unsigned, vec![1, 2]);
+        assert_eq!(whole_list_set_unsigned, vec![0, 1, 2, 3, 4]);
     }
 }
 

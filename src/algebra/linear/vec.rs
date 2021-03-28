@@ -1,6 +1,7 @@
 use crate::algebra::linear::mat::Matrix;
 use crate::algebra::linear::scalar::Scalar;
-use fructose::operators::{ClosedAdd, ClosedMul};
+use fructose::algebra::helpers::identity::{Two, One};
+use fructose::operators::{ClosedAdd, ClosedMul, ClosedSub};
 use std::ops::{Index, IndexMut};
 
 pub type Point<T, const N: usize> = Vector<T, { N }>;
@@ -10,13 +11,6 @@ pub type Vector<T, const N: usize> = Matrix<T, { N }, 1>;
 pub type RowVector<T, const N: usize> = Matrix<T, 1, { N }>;
 
 impl<T: Scalar + Copy + ClosedMul + ClosedAdd, const N: usize> Vector<T, { N }> {
-    // #[inline]
-    // pub fn unit(n: usize) -> Self {
-    //     let mut data = [<T>::default(); N];
-    //     data[n] = <T>::one();
-    //     Self { data: [data] }
-    // }
-
     #[inline]
     pub fn dot(&self, other: Self) -> T {
         let mut sum = <T>::default();
@@ -39,12 +33,21 @@ impl<T: Scalar + Copy + ClosedMul + ClosedAdd, const N: usize> Vector<T, { N }> 
     }
 }
 
-// impl<T: Scalar + Two, const N: usize> Vector<T, { N }> {
-//     #[inline]
-//     pub fn reflect(&mut self, normal: Self) {
-//         *self -= normal * <T>::two() * self.dot(normal);
-//     }
-// }
+impl<T: Scalar + One, const N: usize> Vector<T, { N }> {
+    #[inline]
+    pub fn unit(n: usize) -> Self {
+        let mut data = [<T>::default(); N];
+        data[n] = <T>::one();
+        Self { data: [data] }
+    }
+}
+
+impl<T: Scalar + Two + ClosedMul + ClosedAdd + ClosedSub, const N: usize> Vector<T, { N }> {
+    #[inline]
+    pub fn reflect(&mut self, normal: Self) {
+        *self -= normal * <T>::two() * self.dot(normal);
+    }
+}
 
 impl<T, const N: usize> From<[T; N]> for Vector<T, { N }> {
     fn from(rhs: [T; N]) -> Self {
@@ -150,41 +153,3 @@ impl<T, const N: usize> IndexMut<usize> for Vector<T, { N }> {
 //         )+
 //     }
 // }
-//
-// #[test]
-// #[ignore]
-// fn speed() {
-//     use super::vec::Vector;
-//     use std::time::Instant;
-//     let mut vec_n = Vector::from([2.0, 3.0, -2.0, 1.0, 2.0, 3.0, 7.0, 8.0, 5.0, -2.0]);
-//
-//     let start_n = Instant::now();
-//     for _ in 0..1 {
-//         let x = vec_n.add(vec_n);
-//     }
-//     let stop_n = start_n.elapsed();
-//
-//     println!("{:?} took: {}", vec_n, stop_n.as_secs_f64());
-// }
-
-#[cfg(test)]
-mod vec_tests {
-    use crate::linear::vec::Point;
-    use fructose::algebra::linear::vector::NormedSpace;
-
-    #[test]
-    fn test() {
-        let p0 = Point::from([2, 2]);
-        let p1 = Point::from([3, 2]);
-        let sub = p0 - p1;
-        let conv = Point {
-            data: [[sub[[0, 0]] as f32, sub[[1, 0]] as f32]],
-        };
-        let size = conv.norm() as i32;
-        println!("{}", p0);
-        println!("{}", p1);
-        println!("{}", sub);
-        println!("{}", conv);
-        println!("{}", size)
-    }
-}

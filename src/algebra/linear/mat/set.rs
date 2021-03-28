@@ -1,7 +1,7 @@
 use super::Matrix;
 use crate::algebra::linear::scalar::Scalar;
 use crate::algebra::linear::vec::Vector;
-use crate::linear::mat::SquareMatrix;
+use crate::algebra::linear::SquareMatrix;
 use fructose::algebra::field::{ComplexField, Field};
 use fructose::algebra::helpers::identity::{One, Zero};
 use fructose::algebra::linear::vector::{AffineSpace, InnerSpace, Norm, NormedSpace, VectorSpace};

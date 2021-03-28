@@ -1,14 +1,11 @@
 #![allow(unused)]
-// #![deny(unused_imports)]
-
-pub use algebra::linear;
+#![deny(unused_imports)]
 
 pub mod algebra;
+pub mod impls;
 // pub mod group_theory;
 // pub mod number_theory;
-// pub mod numeric;
 
-// pub mod impls;
 #[macro_use]
 pub mod util;
 // this allows syntax like:

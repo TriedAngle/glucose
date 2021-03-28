@@ -29,3 +29,4 @@ This project is inspired by multiple other crates and I want to thank them:
 * nalgebra
 * ultraviolet
 * ndarry
+* alga

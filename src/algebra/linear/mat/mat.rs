@@ -1,4 +1,4 @@
-use crate::linear::scalar::Scalar;
+use crate::algebra::linear::Scalar;
 use fructose::algebra::helpers::sign::Signed;
 use fructose::algebra::lattice::Lattice;
 use fructose::operators::{ClosedAdd, ClosedDiv, ClosedMul, ClosedNeg, ClosedRem, ClosedSub};
@@ -471,16 +471,15 @@ impl<T: FromStr + Default + Copy, const M: usize, const N: usize> From<String>
 
 #[cfg(test)]
 mod mat_tests {
-    use super::*;
-    use crate::linear::vec::Vector;
+    use crate::algebra::linear::{Matrix, Vector};
 
     #[test]
     fn parse() {
-        let vec_string = String::from("2 2");
+        let vec_string = String::from("2 3 -5");
         let mat_string = String::from("2 3;-1 4;0 -2");
         let vec = Vector::<i32, 3>::from(vec_string);
         let mat = Matrix::<i32, 2, 3>::from(mat_string);
-        // assert_eq!(vec, Vector::new([[2, 3, -5]]));
-        // assert_eq!(mat, Matrix::new([[2, 3], [-1, 4], [0, -2]]));
+        assert_eq!(vec, Vector::new([[2, 3, -5]]));
+        assert_eq!(mat, Matrix::new([[2, 3], [-1, 4], [0, -2]]));
     }
 }

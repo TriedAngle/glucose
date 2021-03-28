@@ -2,8 +2,8 @@
 #![deny(unused_imports)]
 
 pub mod algebra;
+pub mod group_theory;
 pub mod impls;
-// pub mod group_theory;
 // pub mod number_theory;
 
 #[macro_use]

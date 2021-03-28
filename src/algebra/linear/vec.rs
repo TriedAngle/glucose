@@ -1,6 +1,6 @@
 use crate::algebra::linear::mat::Matrix;
 use crate::algebra::linear::scalar::Scalar;
-use fructose::algebra::helpers::identity::{Two, One};
+use fructose::algebra::helpers::identity::{One, Two};
 use fructose::operators::{ClosedAdd, ClosedMul, ClosedSub};
 use std::ops::{Index, IndexMut};
 

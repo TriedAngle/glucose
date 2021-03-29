@@ -2,10 +2,7 @@ use crate::algebra::linear::scalar::Scalar;
 use fructose::operators::{
     Additive, ClosedAdd, ClosedDiv, ClosedMul, ClosedNeg, ClosedSub, Multiplicative,
 };
-use fructose::properties::general::{
-    Associative, Commutative, Identity, Invertible, PartiallyOrdered, Set, Total,
-};
-use fructose::properties::helpers::identity::{One, Zero};
+use fructose::properties::general::{Associative, Commutative, Identity, Invertible, Set, Total};
 use fructose::specific::complex::Real;
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
@@ -240,41 +237,6 @@ impl<T: Scalar + Identity<Multiplicative> + ClosedMul> Identity<Multiplicative> 
 
     fn is_identity(&self) -> bool {
         *self == Self::identity()
-    }
-}
-
-impl<T: Scalar + PartiallyOrdered<Additive>> PartiallyOrdered<Additive> for Bivector2<T> {}
-
-impl<T: Scalar + PartiallyOrdered<Multiplicative>> PartiallyOrdered<Multiplicative>
-    for Bivector2<T>
-{
-}
-
-impl<T: Scalar + ClosedAdd + Identity<Additive> + PartiallyOrdered<Additive>> Zero
-    for Bivector2<T>
-{
-    fn zero() -> Self {
-        Self {
-            data: <T>::identity(),
-        }
-    }
-
-    fn is_zero(&self) -> bool {
-        *self == Self::zero()
-    }
-}
-
-impl<T: Scalar + ClosedMul + Identity<Multiplicative> + PartiallyOrdered<Multiplicative>> One
-    for Bivector2<T>
-{
-    fn one() -> Self {
-        Self {
-            data: <T>::identity(),
-        }
-    }
-
-    fn is_one(&self) -> bool {
-        *self == Self::one()
     }
 }
 

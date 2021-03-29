@@ -196,29 +196,3 @@ impl<T: Scalar + ClosedOps + ComplexField<RealField = T> + Norm, const N: usize>
         *self - *rhs
     }
 }
-
-// impl<T: Scalar + ClosedOps + ComplexField<RealField = T> + Norm, const N: usize> EuclideanSpace for Vector<T, { N }> {
-//     type Coordinates = Point<T, {N}>;
-//     type RealField = T;
-//     const ORIGIN: Self = Self { data: [[0; N]; 1]};
-//
-//     fn scale_by(&self, scalar: Self::RealField) -> Self {
-//         unimplemented!()
-//     }
-//
-//     fn coordinates(&self) -> Self::Coordinates {
-//         unimplemented!()
-//     }
-//
-//     fn from_coordinates(coordinates: Self::Coordinates) -> Self {
-//         unimplemented!()
-//     }
-//
-//     fn distance_squared(&self, b: &Self) -> Self::RealField {
-//         unimplemented!()
-//     }
-//
-//     fn distance(&self, b: &Self) -> Self::RealField {
-//         unimplemented!()
-//     }
-// }

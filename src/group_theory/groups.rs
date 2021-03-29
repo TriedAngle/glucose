@@ -1,9 +1,12 @@
 use fructose::operators::mul_add::ClosedMulAdd;
 use fructose::operators::{Additive, ClosedAdd, ClosedMul, ClosedRem, Multiplicative};
+use fructose::properties::euclidean::EuclideanDiv;
 use fructose::properties::general::{Associative, Commutative, Identity, Set, Total};
 use fructose::properties::helpers::bound::Bounded;
 use fructose::properties::helpers::list::{ListSet, WholeListSet};
-use std::ops::{Add, AddAssign, Mul, MulAssign, Range, Sub, SubAssign};
+use std::ops::{
+    Add, AddAssign, Div, DivAssign, Mul, MulAssign, Range, Rem, RemAssign, Sub, SubAssign,
+};
 
 // TODO: add this to fructose
 // this method is not intended to be used for 32bit and above sets
@@ -41,9 +44,42 @@ macro_rules! impl_ops {
             impl_ops!(@general $set_unsigned);
             impl_ops!(@signed $set_signed);
             impl_ops!(@unsigned $set_unsigned);
+            impl_ops!(@euclid $set_signed : $set_signed : $set_unsigned => @sign);
+            impl_ops!(@euclid $set_unsigned : $set_signed : $set_unsigned => @nosign);
         )*
     };
+    (@euclid_helper $val:expr => @sign) => {
+        $val.val.abs() as Self::Norm
+    };
+    (@euclid_helper $val:expr => @nosign) => {
+        $val.val as Self::Norm
+    };
+    (@euclid $set:ty : $signed:ty : $unsigned:ty => $($tt:tt)*) => {
+        impl<const MAX: usize> EuclideanDiv for FI<$set, { MAX }> {
+            type Norm = $unsigned;
+
+            #[inline]
+            fn euclid_norm(&self) -> Self::Norm {
+                impl_ops!(@euclid_helper *self => $($tt)*)
+            }
+
+            #[inline]
+            fn euclid_div(&self, rhs: Self) -> (Self, Self) {
+                (*self / rhs, *self % rhs)
+            }
+        }
+    };
     (@general $set:ty) => {
+        impl<const MAX: usize> FI<$set, { MAX }> {
+            pub fn max_primitive(&self) -> $set {
+                MAX as $set
+            }
+
+            pub fn max(&self) -> Self {
+                Self { val: MAX as $set }
+            }
+        }
+
         impl<const MAX: usize> Add for FI<$set, { MAX }> {
             type Output = Self;
 
@@ -78,6 +114,38 @@ macro_rules! impl_ops {
             }
         }
 
+        impl<const MAX: usize> Div for FI<$set, { MAX }> {
+            type Output = Self;
+
+            fn div(self, rhs: Self) -> Self::Output {
+                let mut val = self.val / rhs.val;
+                val %= MAX as $set;
+                Self { val: val }
+            }
+        }
+
+        impl<const MAX: usize> DivAssign for FI<$set, { MAX }> {
+            fn div_assign(&mut self, rhs: Self) {
+                self.val /= rhs.val;
+                self.val %= MAX as $set;
+            }
+        }
+
+        impl<const MAX: usize> Rem for FI<$set, { MAX }> {
+            type Output = Self;
+
+            fn rem(self, rhs: Self) -> Self::Output {
+                let mut val = self.val % rhs.val;
+                Self { val: val }
+            }
+        }
+
+        impl<const MAX: usize> RemAssign for FI<$set, { MAX }> {
+            fn rem_assign(&mut self, rhs: Self) {
+                self.val %= rhs.val;
+            }
+        }
+
         impl<const MAX: usize> Set<Additive> for FI<$set, { MAX }> {
             fn operate(&self, rhs: Self) -> Self { *self + rhs }
         }
@@ -97,12 +165,30 @@ macro_rules! impl_ops {
             }
 
             fn is_identity(&self) -> bool {
-                *self == Self::identity()
+                *self == <Self as Identity<Additive>>::identity()
             }
         }
 
         impl<const MAX: usize> Set<Multiplicative> for FI<$set, { MAX }> {
             fn operate(&self, rhs: Self) -> Self { *self * rhs }
+        }
+
+        impl<const MAX: usize> Total<Multiplicative> for FI<$set, { MAX }> { }
+
+        impl<const MAX: usize> Associative<Multiplicative> for FI<$set, { MAX }> { }
+
+        impl<const MAX: usize> Commutative<Multiplicative> for FI<$set, { MAX }> { }
+
+        impl<const MAX: usize> Identity<Multiplicative> for FI<$set, { MAX }> {
+            fn identity() -> Self {
+                Self {
+                    val: <$set as Identity<Multiplicative>>::identity()
+                }
+            }
+
+            fn is_identity(&self) -> bool {
+                *self == <Self as Identity<Multiplicative>>::identity()
+            }
         }
 
         impl<const MAX: usize> ListSet<$set> for FI<$set, { MAX }> {
@@ -153,19 +239,28 @@ macro_rules! impl_ops {
             const MIN: $set = 0 as $set;
             const MAX: $set = (MAX - 1) as $set;
         }
-    }
+    };
 }
 
-impl_ops!(i32: u32);
+impl_ops! {
+    isize: usize
+    i8   : u8
+    i16  : u16
+    i32  : u32
+    i64  : u64
+    i128 : u128
+}
 
 #[cfg(test)]
 mod group_tests {
     use super::FI;
+    use fructose::algorithms::euclidean::extended_euclidean;
+    use fructose::properties::euclidean::EuclideanDiv;
     use fructose::properties::helpers::bound::Bounded;
     use fructose::properties::helpers::list::{ListSet, WholeListSet};
 
     #[test]
-    fn signed() {
+    fn test_signed() {
         let x = FI::<i32, 6>::new(5);
         let y = FI::<i32, 6>::new(4);
         let z = x + y;
@@ -181,7 +276,7 @@ mod group_tests {
     }
 
     #[test]
-    fn unsigned() {
+    fn test_unsigned() {
         let x = FI::<u32, 6>::new(5);
         let y = FI::<u32, 6>::new(4);
         let z = x + y;
@@ -193,7 +288,7 @@ mod group_tests {
     }
 
     #[test]
-    fn range() {
+    fn test_range() {
         let list_set_signed = FI::<i32, 5>::list_set((-2..4));
         let whole_list_set_signed = FI::<i32, 5>::whole_list_set();
 
@@ -207,7 +302,21 @@ mod group_tests {
     }
 
     #[test]
-    fn euclidean() {}
+    fn test_euclidean() {
+        let x = FI::<i32, 20>::new(15);
+        let y = FI::<i32, 20>::new(6);
+        let (a, b) = x.euclid_div(y);
+        assert_eq!(a.value(), 2);
+        assert_eq!(b.value(), 3);
+    }
+
+    #[test]
+    fn test_extended_euclidean() {
+        let x = FI::<i32, 1491>::new(935);
+        let (a, b, _) = extended_euclidean(x, x.max());
+        assert_eq!(a.value(), 716);
+        assert_eq!(b.value(), -449);
+    }
 }
 
 // // returns (coprime, order)

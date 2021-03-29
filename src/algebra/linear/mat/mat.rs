@@ -1,6 +1,9 @@
 use crate::algebra::linear::{Scalar, Vector};
 use fructose::algebra::lattice::Lattice;
-use fructose::operators::{ClosedAdd, ClosedDiv, ClosedMul, ClosedNeg, ClosedRem, ClosedSub};
+use fructose::operators::{
+    ClosedAdd, ClosedDiv, ClosedMul, ClosedNeg, ClosedOps, ClosedRem, ClosedSub,
+};
+use fructose::properties::helpers::identity::{One, Zero};
 use fructose::properties::helpers::sign::Signed;
 use std::alloc::Layout;
 use std::fmt::{Display, Formatter};
@@ -149,18 +152,6 @@ impl<T: Scalar, const M: usize, const N: usize> Matrix<T, { M }, { N }> {
             .iter_mut()
             .for_each(|e| e.iter_mut().for_each(|e| *e = f(*e)));
     }
-
-    // constructs a new VecN with all values being 0
-    // #[inline]
-    // pub fn zero() -> Self {
-    //     Self::broadcast(<T>::zero())
-    // }
-    //
-    // /// constructs a new VecN with all values being 1
-    // #[inline]
-    // pub fn one() -> Self {
-    //     Self::broadcast(<T>::one())
-    // }
 }
 
 impl<T: Scalar + Signed, const M: usize, const N: usize> Matrix<T, { M }, { N }> {
@@ -194,13 +185,12 @@ impl<T: Scalar + Lattice, const M: usize, const N: usize> Matrix<T, { M }, { N }
         }
     }
 
-    /// returns a VecN' with clamped values without consuming VecN
-    // #[inline]
-    // pub fn clamped(&self, min: Self, max: Self) -> Self {
-    //     let mut mat = *self;
-    //     mat.clamp(min, max);
-    //     mat
-    // }
+    #[inline]
+    pub fn clamped(&self, min: Self, max: Self) -> Self {
+        let mut mat = *self;
+        mat.clamp(min, max);
+        mat
+    }
 
     /// returns a new VecN' with each component having the bigger number from either VecN1 or VecN2
     #[inline]
@@ -227,47 +217,47 @@ impl<T: Scalar + Lattice, const M: usize, const N: usize> Matrix<T, { M }, { N }
     }
 }
 
-// impl<T: Scalar, const M: usize> SquareMatrix<T, { M }> {
-//     #[inline]
-//     pub fn mul_identity() -> Self {
-//         let mut mat = Self::zero();
-//         for m in 0..M {
-//             mat[[m, m]] = T::one();
-//         }
-//         mat
-//     }
-//
-//     #[inline]
-//     pub fn determinant(&self) -> T {
-//         match M {
-//             0 => T::one(),
-//             1 => self[[0, 0]],
-//             2 => self[[0, 0]] * self[[1, 1]] - self[[1, 0]] * self[[1, 0]],
-//             3 => {
-//                 let e11 = self[[0, 0]];
-//                 let e12 = self[[0, 1]];
-//                 let e13 = self[[0, 2]];
-//
-//                 let e21 = self[[1, 0]];
-//                 let e22 = self[[1, 1]];
-//                 let e23 = self[[1, 2]];
-//
-//                 let e31 = self[[2, 0]];
-//                 let e32 = self[[2, 1]];
-//                 let e33 = self[[2, 2]];
-//
-//                 let minor_1 = e22 * e33 - e32 * e23;
-//                 let minor_2 = e21 * e33 - e31 * e23;
-//                 let minor_3 = e21 * e32 - e31 * e22;
-//
-//                 e11 * minor_1 - e12 * minor_2 + e13 * minor_3
-//             }
-//             _ => {
-//                 unimplemented!("TODO: Add LU Decomposition")
-//             }
-//         }
-//     }
-// }
+impl<T: Scalar + Zero + One + ClosedOps, const M: usize> SquareMatrix<T, { M }> {
+    #[inline]
+    pub fn mul_identity() -> Self {
+        let mut mat = Self::zero();
+        for m in 0..M {
+            mat[[m, m]] = T::one();
+        }
+        mat
+    }
+
+    #[inline]
+    pub fn determinant(&self) -> T {
+        match M {
+            0 => T::one(),
+            1 => self[[0, 0]],
+            2 => self[[0, 0]] * self[[1, 1]] - self[[1, 0]] * self[[1, 0]],
+            3 => {
+                let e11 = self[[0, 0]];
+                let e12 = self[[0, 1]];
+                let e13 = self[[0, 2]];
+
+                let e21 = self[[1, 0]];
+                let e22 = self[[1, 1]];
+                let e23 = self[[1, 2]];
+
+                let e31 = self[[2, 0]];
+                let e32 = self[[2, 1]];
+                let e33 = self[[2, 2]];
+
+                let minor_1 = e22 * e33 - e32 * e23;
+                let minor_2 = e21 * e33 - e31 * e23;
+                let minor_3 = e21 * e32 - e31 * e22;
+
+                e11 * minor_1 - e12 * minor_2 + e13 * minor_3
+            }
+            _ => {
+                unimplemented!("TODO: Add LU Decomposition")
+            }
+        }
+    }
+}
 
 impl<T, const M: usize, const N: usize> Index<[usize; 2]> for Matrix<T, { M }, { N }> {
     type Output = T;

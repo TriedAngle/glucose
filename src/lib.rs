@@ -1,10 +1,11 @@
 #![allow(unused)]
 #![deny(unused_imports)]
 
+#[cfg(feature = "algebra")]
 pub mod algebra;
+#[cfg(feature = "groups")]
 pub mod group_theory;
 pub mod impls;
-// pub mod number_theory;
 
 #[macro_use]
 pub mod util;

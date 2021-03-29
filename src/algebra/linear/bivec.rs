@@ -1,11 +1,11 @@
 use crate::algebra::linear::scalar::Scalar;
-use fructose::algebra::helpers::identity::{One, Zero};
-use fructose::algebra::properties::general::{
-    Associative, Commutative, Identity, Invertible, PartiallyOrdered, Set, Total,
-};
 use fructose::operators::{
     Additive, ClosedAdd, ClosedDiv, ClosedMul, ClosedNeg, ClosedSub, Multiplicative,
 };
+use fructose::properties::general::{
+    Associative, Commutative, Identity, Invertible, PartiallyOrdered, Set, Total,
+};
+use fructose::properties::helpers::identity::{One, Zero};
 use fructose::specific::complex::Real;
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 

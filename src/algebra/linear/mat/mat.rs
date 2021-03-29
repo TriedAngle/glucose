@@ -1,7 +1,7 @@
 use crate::algebra::linear::Scalar;
-use fructose::algebra::helpers::sign::Signed;
 use fructose::algebra::lattice::Lattice;
 use fructose::operators::{ClosedAdd, ClosedDiv, ClosedMul, ClosedNeg, ClosedRem, ClosedSub};
+use fructose::properties::helpers::sign::Signed;
 use std::alloc::Layout;
 use std::fmt::{Display, Formatter};
 use std::ops::{

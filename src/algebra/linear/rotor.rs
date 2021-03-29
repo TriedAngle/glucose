@@ -2,11 +2,11 @@ use crate::algebra::linear::bivec::Bivector2;
 use crate::algebra::linear::mat::Matrix;
 use crate::algebra::linear::scalar::Scalar;
 use crate::algebra::linear::vec::Vector;
-use fructose::algebra::helpers::identity::{One, Two, Zero};
-use fructose::algebra::helpers::trig::TrigOps;
-use fructose::algebra::properties::general::{Associative, Identity, Set, Total};
 use fructose::operators::mul_add::MulAdd;
+use fructose::operators::trig::TrigOps;
 use fructose::operators::{Additive, ClosedAdd, ClosedDiv, ClosedMul, ClosedNeg, ClosedOps};
+use fructose::properties::general::{Associative, Identity, Set, Total};
+use fructose::properties::helpers::identity::{One, Two, Zero};
 use fructose::specific::complex::Real;
 use std::ops::{Add, AddAssign};
 

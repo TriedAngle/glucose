@@ -3,14 +3,12 @@ use crate::algebra::linear::scalar::Scalar;
 use crate::algebra::linear::vec::Vector;
 use crate::algebra::linear::SquareMatrix;
 use fructose::algebra::field::{ComplexField, Field};
-use fructose::algebra::helpers::identity::{One, Zero};
 use fructose::algebra::linear::vector::{AffineSpace, InnerSpace, Norm, NormedSpace, VectorSpace};
 use fructose::algebra::module::Module;
-use fructose::algebra::properties::general::{
-    Associative, Commutative, Identity, Invertible, Set, Total,
-};
 use fructose::algebra::ring::CommutativeRing;
 use fructose::operators::{Additive, ClosedAdd, ClosedMul, ClosedOps, Multiplicative};
+use fructose::properties::general::{Associative, Commutative, Identity, Invertible, Set, Total};
+use fructose::properties::helpers::identity::{One, Zero};
 use std::iter::Sum;
 
 impl<T: Scalar + ClosedAdd, const M: usize, const N: usize> Set<Additive>

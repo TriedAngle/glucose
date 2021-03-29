@@ -1,7 +1,7 @@
 use crate::algebra::linear::mat::Matrix;
 use crate::algebra::linear::scalar::Scalar;
-use fructose::algebra::helpers::identity::{One, Two};
 use fructose::operators::{ClosedAdd, ClosedMul, ClosedSub};
+use fructose::properties::helpers::identity::{One, Two};
 use std::ops::{Index, IndexMut};
 
 pub type Point<T, const N: usize> = Vector<T, { N }>;

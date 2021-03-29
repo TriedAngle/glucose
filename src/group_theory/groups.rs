@@ -1,9 +1,8 @@
-use fructose::algebra::helpers::bound::Bounded;
-use fructose::algebra::helpers::list::{ListSet, WholeListSet};
-use fructose::algebra::properties::general::{Associative, Commutative, Identity, Set, Total};
 use fructose::operators::mul_add::ClosedMulAdd;
 use fructose::operators::{Additive, ClosedAdd, ClosedMul, ClosedRem, Multiplicative};
-
+use fructose::properties::general::{Associative, Commutative, Identity, Set, Total};
+use fructose::properties::helpers::bound::Bounded;
+use fructose::properties::helpers::list::{ListSet, WholeListSet};
 use std::ops::{Add, AddAssign, Mul, MulAssign, Range, Sub, SubAssign};
 
 // TODO: add this to fructose
@@ -162,9 +161,8 @@ impl_ops!(i32: u32);
 #[cfg(test)]
 mod group_tests {
     use super::FI;
-    use crate::group_theory::groups::WholeListSet;
-    use fructose::algebra::helpers::bound::Bounded;
-    use fructose::algebra::helpers::list::ListSet;
+    use fructose::properties::helpers::bound::Bounded;
+    use fructose::properties::helpers::list::{ListSet, WholeListSet};
 
     #[test]
     fn signed() {
@@ -207,6 +205,9 @@ mod group_tests {
         assert_eq!(list_set_unsigned, vec![1, 2]);
         assert_eq!(whole_list_set_unsigned, vec![0, 1, 2, 3, 4]);
     }
+
+    #[test]
+    fn euclidean() {}
 }
 
 // // returns (coprime, order)

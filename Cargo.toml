@@ -14,10 +14,14 @@ description = "multipurpose math and physics crate for my projects"
 name = "glucose"
 path = "src/lib.rs"
 
+[features]
+default = ["full"]
+full = ["algebra", "groups", "analysis", "bytemuck"]
+algebra = []
+groups = []
+analysis = []
 
 [dependencies]
 paste = "1.0.4"
-fructose = "0.3.6"
+fructose = "0.3.7"
 bytemuck = { version = "1.5.1", optional = true }
-serde = { version = "1.0.123", optional = true }
-serde_test = "1.0.123"

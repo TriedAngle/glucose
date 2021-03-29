@@ -1,3 +1,4 @@
+use fructose::algorithms::euclidean::extended_euclidean;
 use fructose::operators::mul_add::ClosedMulAdd;
 use fructose::operators::{Additive, ClosedAdd, ClosedMul, ClosedRem, Multiplicative};
 use fructose::properties::euclidean::EuclideanDiv;
@@ -78,6 +79,10 @@ macro_rules! impl_ops {
             pub fn max(&self) -> Self {
                 Self { val: MAX as $set }
             }
+
+            pub fn eea(self) -> (Self, Self, Self) {
+                extended_euclidean(self, self.max())
+            }
         }
 
         impl<const MAX: usize> Add for FI<$set, { MAX }> {
@@ -93,6 +98,23 @@ macro_rules! impl_ops {
         impl<const MAX: usize> AddAssign for FI<$set, { MAX }> {
             fn add_assign(&mut self, rhs: Self) {
                 self.val += rhs.val;
+                self.val %= MAX as $set;
+            }
+        }
+
+        impl<const MAX: usize> Sub for FI<$set, { MAX }> {
+            type Output = Self;
+
+            fn sub(self, rhs: Self) -> Self::Output {
+                let mut val = self.val - rhs.val;
+                val %= MAX as $set;
+                Self { val }
+            }
+        }
+
+        impl<const MAX: usize> SubAssign for FI<$set, { MAX }> {
+            fn sub_assign(&mut self, rhs: Self) {
+                self.val -= rhs.val;
                 self.val %= MAX as $set;
             }
         }
@@ -216,23 +238,6 @@ macro_rules! impl_ops {
             const MIN: $set = -(MAX as $set) + 1;
             const MAX: $set = (MAX as $set) - 1;
         }
-
-        impl<const MAX: usize> Sub for FI<$set, { MAX }> {
-            type Output = Self;
-
-            fn sub(self, rhs: Self) -> Self::Output {
-                let mut val = self.val - rhs.val;
-                val %= MAX as $set;
-                Self { val }
-            }
-        }
-
-        impl<const MAX: usize> SubAssign for FI<$set, { MAX }> {
-            fn sub_assign(&mut self, rhs: Self) {
-                self.val -= rhs.val;
-                self.val %= MAX as $set;
-            }
-        }
     };
     (@unsigned $set:ty) => {
         impl<const MAX: usize> Bounded<$set> for FI<$set, { MAX }> {
@@ -254,7 +259,7 @@ impl_ops! {
 #[cfg(test)]
 mod group_tests {
     use super::FI;
-    use fructose::algorithms::euclidean::extended_euclidean;
+
     use fructose::properties::euclidean::EuclideanDiv;
     use fructose::properties::helpers::bound::Bounded;
     use fructose::properties::helpers::list::{ListSet, WholeListSet};
@@ -313,7 +318,7 @@ mod group_tests {
     #[test]
     fn test_extended_euclidean() {
         let x = FI::<i32, 1491>::new(935);
-        let (a, b, _) = extended_euclidean(x, x.max());
+        let (a, b, _) = x.eea();
         assert_eq!(a.value(), 716);
         assert_eq!(b.value(), -449);
     }

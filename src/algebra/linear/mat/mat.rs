@@ -1,4 +1,4 @@
-use crate::algebra::linear::Scalar;
+use crate::algebra::linear::{Scalar, Vector};
 use fructose::algebra::lattice::Lattice;
 use fructose::operators::{ClosedAdd, ClosedDiv, ClosedMul, ClosedNeg, ClosedRem, ClosedSub};
 use fructose::properties::helpers::sign::Signed;
@@ -113,12 +113,19 @@ impl<T, const M: usize, const N: usize> Matrix<T, { M }, { N }> {
     }
 }
 
-impl<T: Scalar, const M: usize, const N: usize> Matrix<T, { M }, { N }> {
+impl<T: Default + Copy, const M: usize, const N: usize> Matrix<T, { M }, { N }> {
     #[inline]
-    pub fn to_vectors(&self) -> [[T; M]; N] {
-        self.data
+    pub fn to_vectors(&self) -> [Vector<T, { M }>; { N }] {
+        let mut vectors = [Vector::default(); N];
+        for n in 0..N {
+            let vec = Vector::from(self.data[n]);
+            vectors[0] = vec;
+        }
+        vectors
     }
+}
 
+impl<T: Scalar, const M: usize, const N: usize> Matrix<T, { M }, { N }> {
     #[inline]
     pub fn broadcast(value: T) -> Self {
         Self {

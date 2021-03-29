@@ -16,12 +16,14 @@ path = "src/lib.rs"
 
 [features]
 default = ["full"]
-full = ["algebra", "groups", "analysis", "bytemuck"]
+full-extras = ["full", "bytemuck", "mint"]
+full = ["algebra", "groups", "analysis"]
 algebra = []
 groups = []
 analysis = []
 
 [dependencies]
-paste = "1.0.4"
+paste = "1.0.5"
 fructose = "0.3.7"
 bytemuck = { version = "1.5.1", optional = true }
+mint = { version = "0.5.6", optional = true }
